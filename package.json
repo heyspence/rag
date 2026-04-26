@@ -1,0 +1,28 @@
+{
+  "name": "mcp-rag-endpoint",
+  "version": "1.0.0",
+  "description": "MCP compatible RAG endpoint for local document indexing and retrieval",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1",
+    "chokidar": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0",
+    "node-fetch": "^2.7.0",
+    "pdf-parse": "^1.1.3"
+  },
+  "keywords": [
+    "mcp",
+    "rag",
+    "lm-studio",
+    "vector-db",
+    "embeddings"
+  ],
+  "author": "",
+  "license": "ISC"
+}
