@@ -1,0 +1,1 @@
+VECTOR_STORE_PATH=Z:\PROJECTS\RAG\rag_endpoint\src\vector_db  # Now handled as an absolute path internally via path.resolve() for Windows compatibility
