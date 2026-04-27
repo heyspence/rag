@@ -149,42 +149,6 @@ async function main() {
 
   // Initial Indexing on startup
 
-  /**
-   * Performs the initial bulk indexing of all documents in the folder.
-   * This is called as a background task to avoid blocking server startup.
-   */
-  async function performBulkIndex() {
-    try {
-      vectorDb.clear();
-      const allFiles = await getAllFiles(CONFIG.DOCUMENTS_FOLDER);
-      if (allFiles.length === 0) return;
-
-      const queue = [...allFiles];
-      console.error(
-        `[RAG Server] Starting background bulk index of ${allFiles.length} files with concurrency ${CONFIG.INDEXING_CONCURRENCY}...`,
-      );
-
-      const workers = Array(CONFIG.INDEXING_CONCURRENCY)
-        .fill(null)
-        .map(async (_, workerId) => {
-          while (queue.length > 0) {
-            const file = queue.shift();
-            if (file) {
-              await indexFile(file, true);
-            }
-          }
-        });
-
-      await Promise.all(workers);
-      await vectorDb.save();
-      console.error(`[RAG Server] Background bulk indexing complete.`);
-    } catch (error) {
-      console.error(
-        `[RAG Server] Error during bulk indexing: ${error.message}`,
-      );
-    }
-  }
-
   // Watch for changes in the documents folder and all subfolders
   chokidar
     .watch(CONFIG.DOCUMENTS_FOLDER, {
@@ -334,9 +298,6 @@ async function main() {
   // Start Server
   const transport = new StdioServerTransport();
   await server.connect(transport);
-
-  // Start bulk indexing in the background AFTER connecting to prevent LM Studio timeouts
-  performBulkIndex();
 }
 
 main().catch((error) => {

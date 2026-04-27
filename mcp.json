@@ -2,7 +2,7 @@
   "mcpServers": {
     "local-rag": {
       "command": "node",
-      "args": ["Z:\\PROJECTS\\RAG\\rag_endpoint\\index.js"],
+      "args": ["/absolute/path/to/rag_endpoint/index.js"],
       "env": {
         "EMBEDDING_API_KEY": "${ENV:EMBEDDING_API_KEY}"
       }
