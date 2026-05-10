@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email & Agent Management Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #cbd5e1;
+            background-color: #0f172a;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #f8fafc;
+            padding: 32px 40px;
+            border-radius: 16px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #334155;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+            border-color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .status-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid #334155;
+        }
+
+        .status-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .status-icon.success { background-color: #065f46; color: #34d399; }
+        .status-icon.warning { background-color: #78350f; color: #fbbf24; }
+        .status-icon.info { background-color: #1e3a5f; color: #60a5fa; }
+        .status-icon.error { background-color: #7f1d1d; color: #f87171; }
+
+        .status-info h3 {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-info p {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: #1e293b;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.1rem;
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .panel-body {
+            padding: 24px;
+        }
+
+        /* Feature Cards */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature-item {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 16px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.2s ease;
+            border: 1px solid #334155;
+        }
+
+        .feature-item:hover {
+            transform: translateX(4px);
+            border-color: #475569;
+        }
+
+        .feature-item.in-progress {
+            border-left-color: #fbbf24;
+        }
+
+        .feature-item.completed {
+            border-left-color: #10b981;
+        }
+
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-completed { background-color: #065f46; color: #34d399; border: 1px solid #10b981; }
+        .badge-in-progress { background-color: #78350f; color: #fbbf24; border: 1px solid #fbbf24; }
+
+        .feature-description {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        /* Email Inbox */
+        .email-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .email-item {
+            padding: 16px;
+            border-bottom: 1px solid #334155;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .email-item:hover {
+            background-color: #0f172a;
+        }
+
+        .email-item:last-child {
+            border-bottom: none;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .email-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .email-preview {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .email-status.processed { background-color: #065f46; color: #34d399; border: 1px solid #10b981; }
+        .email-status.pending { background-color: #78350f; color: #fbbf24; border: 1px solid #fbbf24; }
+        .email-status.skipped { background-color: #334155; color: #94a3b8; border: 1px solid #475569; }
+
+        /* Agent Cards */
+        .agent-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .agent-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #334155;
+        }
+
+        .agent-card:hover {
+            border-color: #475569;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .agent-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .agent-status-dot.active {
+            background-color: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+        .agent-status-dot.idle {
+            background-color: #fbbf24;
+            box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+        }
+        .agent-status-dot.busy {
+            background-color: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+        }
+
+        .agent-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .agent-stat {
+            text-align: center;
+            padding: 10px 8px;
+            background: #1e293b;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+
+        .agent-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .agent-stat-label {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Activity Log */
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+            font-size: 0.8rem;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: #64748b;
+            font-size: 0.7rem;
+            margin-bottom: 4px;
+        }
+
+        .log-message {
+            color: #cbd5e1;
+        }
+
+        .log-type {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-right: 8px;
+        }
+
+        .log-type.info { background-color: #dbeafe; color: #1e40af; }
+        .log-type.success { background-color: #d1fae5; color: #065f46; }
+        .log-type.warning { background-color: #fef3c7; color: #92400e; }
+        .log-type.error { background-color: #fee2e2; color: #dc2626; }
+
+        /* Configuration Panel */
+        .config-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .config-label {
+            font-weight: 500;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .config-value {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #1e293b;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #60a5fa;
+            border: 1px solid #334155;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #334155;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #94a3b8;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: #10b981;
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background-color: white;
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Footer */
+        .dashboard-footer {
+            text-align: center;
+            padding: 32px;
+            color: #64748b;
+            font-size: 0.85rem;
+            border-top: 1px solid #334155;
+            margin-top: 24px;
+        }
+
+        .dashboard-footer p {
+            margin-bottom: 8px;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #34d399;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 16px;
+            }
+
+            .dashboard-header {
+                padding: 24px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .status-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .panel-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Email Processing Dashboard</h1>
+            <p>RAG-powered email receiving with IMAP/webhook integration and document search</p>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="refreshDashboard()">
+                    <span>🔄</span> Refresh
+                </button>
+                <button class="btn btn-secondary" onclick="viewLogs()">
+                    <span>📋</span> Activity Log
+                </button>
+            </div>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-card">
+                <div class="status-icon success">📧</div>
+                <div class="status-info">
+                    <h3>Emails Processed</h3>
+                    <p id="emailsProcessed">127</p>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon info">📁</div>
+                <div class="status-info">
+                    <h3>Indexed Documents</h3>
+                    <p id="indexedDocs">47</p>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon warning">⏳</div>
+                <div class="status-info">
+                    <h3>Pending Emails</h3>
+                    <p id="pendingEmails">8</p>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon success">✅</div>
+                <div class="status-info">
+                    <h3>System Status</h3>
+                    <p style="font-size: 1rem; margin-top: 4px;">Operational</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Email Inbox Panel -->
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h2>📥 Email Processing Queue</h2>
+                        <span class="live-indicator">
+                            <span class="live-dot"></span>
+                            IMAP Active
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="email-list" id="emailList">
+                            <div class="email-item">
+                                <div class="email-header">
+                                    <span class="email-subject">[prompt] Q3 Sales Report Analysis</span>
+                                    <span class="email-status processed">Processed</span>
+                                </div>
+                                <div class="email-meta">
+                                    <span>From: john@company.com</span>
+                                    <span>2 min ago</span>
+                                </div>
+                                <div class="email-preview">Can you provide information about Q3 sales figures and revenue trends?</div>
+                            </div>
+                            <div class="email-item">
+                                <div class="email-header">
+                                    <span class="email-subject">[prompt] Customer Feedback Summary</span>
+                                    <span class="email-status processed">Processed</span>
+                                </div>
+                                <div class="email-meta">
+                                    <span>From: sarah@company.com</span>
+                                    <span>15 min ago</span>
+                                </div>
+                                <div class="email-preview">Please summarize the customer feedback from last quarter's survey.</div>
+                            </div>
+                            <div class="email-item">
+                                <div class="email-header">
+                                    <span class="email-subject">[prompt] Project Timeline Inquiry</span>
+                                    <span class="email-status pending">Pending</span>
+                                </div>
+                                <div class="email-meta">
+                                    <span>From: mike@company.com</span>
+                                    <span>28 min ago</span>
+                                </div>
+                                <div class="email-preview">What is the current status of the RAG integration project?</div>
+                            </div>
+                            <div class="email-item">
+                                <div class="email-header">
+                                    <span class="email-subject">Weekly Team Update</span>
+                                    <span class="email-status skipped">Skipped</span>
+                                </div>
+                                <div class="email-meta">
+                                    <span>From: team@company.com</span>
+                                    <span>1 hour ago</span>
+                                </div>
+                                <div class="email-preview">No [prompt] tag - email skipped from processing.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>🔧 System Components</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="feature-list">
+                            <div class="feature-item completed">
+                                <div class="feature-header">
+                                    <span class="feature-title">Email Webhook Server</span>
+                                    <span class="badge badge-completed">Active</span>
+                                </div>
+                                <p class="feature-description">HTTP webhook endpoint on port 3000 for Mailgun, SendGrid, AWS SES integration.</p>
+                            </div>
+                            <div class="feature-item completed">
+                                <div class="feature-header">
+                                    <span class="feature-title">IMAP IDLE Monitoring</span>
+                                    <span class="badge badge-completed">Active</span>
+                                </div>
+                                <p class="feature-description">Real-time Gmail/IMAP email monitoring with automatic RAG processing.</p>
+                            </div>
+                            <div class="feature-item completed">
+                                <div class="feature-header">
+                                    <span class="feature-title">Vector Search Engine</span>
+                                    <span class="badge badge-completed">Active</span>
+                                </div>
+                                <p class="feature-description">Cosine similarity search across document embeddings with configurable thresholds.</p>
+                            </div>
+                            <div class="feature-item completed">
+                                <div class="feature-header">
+                                    <span class="feature-title">MCP Tool Interface</span>
+                                    <span class="badge badge-completed">Active</span>
+                                </div>
+                                <p class="feature-description">search_documents, index_status, list_indexed_files, send_email tools available.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Email Service Status -->
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h2>📧 Email Service</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="feature-list">
+                            <div class="feature-item completed">
+                                <div class="feature-header">
+                                    <span class="feature-title">AWS SES Sending</span>
+                                    <span class="badge badge-completed">Configured</span>
+                                </div>
+                                <p class="feature-description">Professional HTML email sending via AWS SES with styled templates.</p>
+                            </div>
+                            <div class="feature-item in-progress">
+                                <div class="feature-header">
+                                    <span class="feature-title">Auto-Response Generation</span>
+                                    <span class="badge badge-in-progress">Planned</span>
+                                </div>
+                                <p class="feature-description">Automated reply generation using RAG search results.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Configuration Panel -->
+                <div class="panel" style="margin-bottom: 24px;">
+                    <div class="panel-header">
+                        <h2>⚙️ Configuration</h2>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="editConfig()">Edit</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <span class="config-label">Webhook Port</span>
+                                <span class="config-value">3000</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Subject Tag</span>
+                                <span class="config-value">[prompt]</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Search Top K</span>
+                                <span class="config-value">10</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Min Score Threshold</span>
+                                <span class="config-value">0.5</span>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">IMAP Monitoring</span>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-label">Auto Agent Spawning</span>
+                                <label class="toggle">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📋 Recent Activity</h2>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="clearLogs()">Clear</button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="activity-log" id="activityLog">
+                            <div class="log-entry">
+                                <div class="log-time">2024-01-15 14:32:18</div>
+                                <span class="log-type success"></span>
+                                <span class="log-message">Email processed successfully - Q3 Sales Report Analysis</span>
+                            </div>
+                            <div class="log-entry">
+                                <div class="log-time">2024-01-15 14:30:45</div>
+                                <span class="log-type info"></span>
+                                <span class="log-message">Agent spawned - Email Processor #3 (high workload detected)</span>
+                            </div>
+                            <div class="log-entry">
+                                <div class="log-time">2024-01-15 14:28:12</div>
+                                <span class="log-type success"></span>
+                                <span class="log-message">Email processed successfully - Customer Feedback Summary</span>
+                            </div>
+                            <div class="log-entry">
+                                <div class="log-time">2024-01-15 14:25:33</div>
+                                <span class="log-type warning"></span>
+                                <span class="log-message">Email skipped - Missing [prompt] tag in subject</span>
+                            </div>
+                            <div class="log-entry">
+                                <div class="log-time">2024-01-15 14:22:08</div>
+                                <span class="log-type info"></span>
+                                <span class="log-message">Document index updated - 3 new files indexed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>Email & Agent Management Dashboard | RAG Endpoint v1.0</p>
+            <p style="margin-top: 8px;">Powered by Model Context Protocol • Vector Embeddings • AWS SES Integration</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dashboard functionality
+        function refreshDashboard() {
+            console.log('Refreshing dashboard...');
+            // Simulate data refresh
+            document.getElementById('emailsProcessed').textContent = Math.floor(Math.random() * 200) + 100;
+            document.getElementById('pendingEmails').textContent = Math.floor(Math.random() * 15);
+            addLogEntry('info', 'Dashboard refreshed manually');
+        }
+
+        function viewLogs() {
+            console.log('Viewing logs...');
+            alert('Full log viewer would open here with filtering and search capabilities.');
+        }
+
+        function configureAgents() {
+            console.log('Configuring agents...');
+            alert('Agent configuration panel would open here with settings for:\n- Max concurrent agents\n- Auto-spawn thresholds\n- Agent type definitions');
+        }
+
+        function refreshStats() {
+            console.log('Refreshing stats...');
+            // Simulate stat updates from server
+            fetch('/status')
+                .then(res => res.json())
+                .then(data => {
+                    // Update dashboard with real data
+                })
+                .catch(err => console.error('Status update failed:', err));
+        }
+
+        function editConfig() {
+            console.log('Editing configuration...');
+            alert('Configuration editor would open here with all environment variable settings.');
+        }
+
+        function clearLogs() {
+            console.log('Clearing logs...');
+            document.getElementById('activityLog').innerHTML = '';
+            addLogEntry('info', 'Activity log cleared');
+        }
+
+        function addLogEntry(type, message) {
+            const logContainer = document.getElementById('activityLog');
+            const now = new Date();
+            const timestamp = now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `
+                <div class="log-time">${timestamp}</div>
+                <span class="log-type ${type}"></span>
+                <span class="log-message">${message}</span>
+            `;
+
+            logContainer.insertBefore(logEntry, logContainer.firstChild);
+
+            // Keep only last 50 entries
+            while (logContainer.children.length > 50) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(refreshStats, 30000);
+
+        // Add initial log entry
+        addLogEntry('success', 'Dashboard loaded successfully');
+    </script>
+</body>
+</html>

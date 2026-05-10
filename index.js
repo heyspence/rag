@@ -11,10 +11,12 @@ const fs = require("fs-extra");
 const path = require("path");
 require("dotenv").config();
 const pdf = require("pdf-parse");
+const express = require("express");
 
 const EmbeddingEngine = require("./embeddingEngine");
-const VectorDatabase = require("./vectorDatabase");
+const MySQLVectorDatabase = require("./mysqlVectorDatabase");
 const EmailService = require("./emailService");
+const express = require("express");
 
 /**
  * Configuration for the RAG Endpoint
@@ -29,6 +31,13 @@ const CONFIG = {
     VECTOR_STORE_PATH:
         process.env.VECTOR_STORE_PATH ||
         path.join(__dirname, "vector_store.json"),
+    // MySQL Vector Database configuration
+    MYSQL_HOST: process.env.MYSQL_HOST || "localhost",
+    MYSQL_PORT: parseInt(process.env.MYSQL_PORT, 10) || 3306,
+    MYSQL_USER: process.env.MYSQL_USER,
+    MYSQL_PASSWORD: process.env.MYSQL_PASSWORD,
+    MYSQL_DATABASE: process.env.MYSQL_DATABASE || "rag_vectors",
+    MYSQL_TABLE_NAME: process.env.MYSQL_TABLE_NAME || "vectors",
     CHUNK_SIZE: 1000, // characters per chunk
     CHUNK_OVERLAP: 200,
     SUPPORTED_EXTENSIONS: [".txt", ".md", ".pdf"], // Only these types are indexed; others (e.g., images) are ignored
@@ -38,6 +47,15 @@ const CONFIG = {
     SEARCH_MIN_SCORE: parseFloat(process.env.RAG_SEARCH_MIN_SCORE) || 0.5,
     // Always reindex from scratch on every restart
     ALWAYS_REINDEX_ON_STARTUP: true,
+    // Email receiving configuration (webhook)
+    EMAIL_WEBHOOK_PORT: parseInt(process.env.EMAIL_WEBHOOK_PORT, 10) || 3000,
+    EMAIL_SUBJECT_TAG: process.env.EMAIL_SUBJECT_TAG || "[prompt]",
+    // IMAP email receiving configuration
+    IMAP_HOST: process.env.IMAP_HOST || "imap.gmail.com",
+    IMAP_PORT: parseInt(process.env.IMAP_PORT, 10) || 993,
+    IMAP_USER: process.env.IMAP_USER,
+    IMAP_PASSWORD: process.env.IMAP_PASSWORD,
+    IMAP_FOLDER: process.env.IMAP_FOLDER || "INBOX",
 };
 
 /**
@@ -53,10 +71,235 @@ function chunkText(text) {
     return chunks;
 }
 
+/**
+ * Setup HTTP webhook server for receiving incoming emails
+ */
+function setupEmailWebhookServer(embeddingEngine, vectorDb) {
+    const app = express();
+
+    // Parse JSON and form data from email webhooks
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+
+    /**
+     * Webhook endpoint for receiving emails
+     * Supports multiple email providers (Mailgun, SendGrid, AWS SES SNS)
+     */
+    app.post("/webhook/email", async (req, res) => {
+        console.log("\n[Email Webhook] Received incoming email request");
+
+        try {
+            // Extract email data - format varies by provider
+            let subject = "";
+            let from = "";
+            let to = "";
+            let bodyText = "";
+            let bodyHtml = "";
+
+            // Mailgun format
+            if (req.body.subject) {
+                subject = req.body.subject;
+                from = req.body.from || "";
+                to = req.body.to || "";
+                bodyText = req.body.body_text || req.body.body_plain || "";
+                bodyHtml = req.body.body_html || req.body.body || "";
+            }
+            // SendGrid format
+            else if (req.body.headers) {
+                const headers = JSON.parse(
+                    typeof req.body.headers === "string"
+                        ? req.body.headers
+                        : JSON.stringify(req.body.headers),
+                );
+                subject = headers.subject || "";
+                from = headers.from || "";
+                to = headers.to || "";
+                bodyText = req.body.text || "";
+                bodyHtml = req.body.html || "";
+            }
+            // AWS SES SNS format (forwarded via HTTP)
+            else if (req.body.Message) {
+                const message = JSON.parse(req.body.Message);
+                subject = message.subject || "";
+                from = message.source || "";
+                to = message.destination?.[0] || "";
+                bodyText = message.content?.text?.body || "";
+                bodyHtml = message.content?.html?.body || "";
+            }
+            // Generic/unknown format - try to extract what we can
+            else {
+                subject = req.body.subject || req.query.subject || "No Subject";
+                from = req.body.from || req.query.from || "Unknown";
+                bodyText =
+                    req.body.message ||
+                    req.body.body ||
+                    req.body.content ||
+                    JSON.stringify(req.body);
+            }
+
+            console.log(`[Email Webhook] From: ${from}`);
+            console.log(`[Email Webhook] To: ${to}`);
+            console.log(`[Email Webhook] Subject: ${subject}`);
+
+            // Check if subject contains the target tag
+            const hasTargetTag = subject.includes(CONFIG.EMAIL_SUBJECT_TAG);
+
+            if (!hasTargetTag) {
+                console.log(
+                    `[Email Webhook] Email does not contain tag [${CONFIG.EMAIL_SUBJECT_TAG}], skipping processing`,
+                );
+                return res.status(200).json({
+                    success: true,
+                    message:
+                        "Email received but skipped (no matching subject tag)",
+                    subject,
+                });
+            }
+
+            console.log(
+                `[Email Webhook] Email contains target tag [${CONFIG.EMAIL_SUBJECT_TAG}], processing...`,
+            );
+
+            // Combine text and HTML content (prefer HTML if available)
+            const emailContent = bodyHtml || bodyText;
+
+            if (!emailContent || emailContent.trim().length === 0) {
+                console.warn("[Email Webhook] Email has no content, skipping");
+                return res.status(200).json({
+                    success: true,
+                    message: "Email received but has no content",
+                    subject,
+                });
+            }
+
+            // Process the email content through RAG pipeline
+            console.log("[Email Webhook] Processing email through RAG...");
+
+            try {
+                // Generate embedding for the email content
+                const queryEmbedding = await embeddingEngine.generateEmbeddings(
+                    [emailContent],
+                );
+
+                if (!queryEmbedding || queryEmbedding.length === 0) {
+                    throw new Error("Failed to generate embedding for email");
+                }
+
+                // Search vector database for relevant documents
+                const searchResults = await vectorDb.search(
+                    queryEmbedding[0],
+                    CONFIG.SEARCH_TOP_K,
+                    CONFIG.SEARCH_MIN_SCORE,
+                );
+
+                console.log(
+                    `[Email Webhook] Found ${searchResults.length} relevant document chunks`,
+                );
+
+                // Format results for response
+                const formattedResults = searchResults.map((result) => ({
+                    chunkId: result.chunkId,
+                    documentPath: result.documentPath,
+                    score: result.score,
+                    content: result.content.substring(0, 500), // Truncate for preview
+                }));
+
+                console.log("[Email Webhook] Email processed successfully");
+
+                return res.status(200).json({
+                    success: true,
+                    message: "Email processed successfully",
+                    subject,
+                    from,
+                    to,
+                    resultsCount: searchResults.length,
+                    results: formattedResults,
+                });
+            } catch (error) {
+                console.error(
+                    "[Email Webhook] Error processing email through RAG:",
+                    error.message,
+                );
+
+                return res.status(500).json({
+                    success: false,
+                    message: "Error processing email",
+                    subject,
+                    error: error.message,
+                });
+            }
+        } catch (error) {
+            console.error("[Email Webhook] Error handling webhook:", error);
+
+            return res.status(500).json({
+                success: false,
+                message: "Internal server error",
+                error: error.message,
+            });
+        }
+    });
+
+    /**
+     * Health check endpoint
+     */
+    app.get("/health", (req, res) => {
+        res.status(200).json({
+            status: "healthy",
+            timestamp: new Date().toISOString(),
+            emailWebhook: true,
+        });
+    });
+
+    /**
+     * Status endpoint showing webhook configuration
+     */
+    app.get("/status", (req, res) => {
+        res.status(200).json({
+            emailWebhook: {
+                enabled: true,
+                port: CONFIG.EMAIL_WEBHOOK_PORT,
+                subjectTag: CONFIG.EMAIL_SUBJECT_TAG,
+                webhookUrl: `http://localhost:${CONFIG.EMAIL_WEBHOOK_PORT}/webhook/email`,
+            },
+        });
+    });
+
+    // Start the HTTP server
+    const httpServer = app.listen(CONFIG.EMAIL_WEBHOOK_PORT, () => {
+        console.log(
+            `\n[Email Webhook] Server started on port ${CONFIG.EMAIL_WEBHOOK_PORT}`,
+        );
+        console.log(
+            `[Email Webhook] Webhook URL: http://localhost:${CONFIG.EMAIL_WEBHOOK_PORT}/webhook/email`,
+        );
+        console.log(
+            `[Email Webhook] Health check: http://localhost:${CONFIG.EMAIL_WEBHOOK_PORT}/health`,
+        );
+        console.log(
+            `[Email Webhook] Status: http://localhost:${CONFIG.EMAIL_WEBHOOK_PORT}/status`,
+        );
+        console.log(
+            `[Email Webhook] Filtering emails with subject tag: ${CONFIG.EMAIL_SUBJECT_TAG}`,
+        );
+    });
+
+    return httpServer;
+}
+
 async function main() {
     console.log("[RAG Server] Initializing RAG endpoint...");
     console.log(`[RAG Server] Documents folder: ${CONFIG.DOCUMENTS_FOLDER}`);
     console.log(`[RAG Server] Embedding API URL: ${CONFIG.EMBEDDING_API_URL}`);
+
+    // Check if IMAP receiving is configured
+    const imapConfigured = !!(CONFIG.IMAP_USER && CONFIG.IMAP_PASSWORD);
+    if (imapConfigured) {
+        console.log("[RAG Server] IMAP email receiving is configured");
+    } else {
+        console.log(
+            "[RAG Server] IMAP email receiving not configured (set IMAP_USER and IMAP_PASSWORD in .env)",
+        );
+    }
 
     // Initialize components
     const embeddingEngine = new EmbeddingEngine({
@@ -65,14 +308,33 @@ async function main() {
         apiKey: CONFIG.EMBEDDING_API_KEY,
     });
 
-    const vectorDb = new VectorDatabase({
-        storagePath: CONFIG.VECTOR_STORE_PATH,
-    });
+    // Check if MySQL is configured, otherwise fall back to JSON-based storage
+    let vectorDb;
+    if (CONFIG.MYSQL_USER && CONFIG.MYSQL_PASSWORD) {
+        console.log("[RAG Server] Using MySQL for vector storage...");
+        vectorDb = new MySQLVectorDatabase({
+            host: CONFIG.MYSQL_HOST,
+            port: CONFIG.MYSQL_PORT,
+            user: CONFIG.MYSQL_USER,
+            password: CONFIG.MYSQL_PASSWORD,
+            database: CONFIG.MYSQL_DATABASE,
+            tableName: CONFIG.MYSQL_TABLE_NAME,
+        });
+    } else {
+        console.log(
+            "[RAG Server] MySQL not configured, falling back to JSON-based vector storage...",
+        );
+        const VectorDatabase = require("./vectorDatabase");
+        vectorDb = new VectorDatabase({
+            storagePath: CONFIG.VECTOR_STORE_PATH,
+        });
+    }
 
     console.log("[RAG Server] Loading vector database...");
     await vectorDb.load();
+    const docCount = (await vectorDb.listDocuments()).length;
     console.log(
-        `[RAG Server] Loaded ${vectorDb.listDocuments().length} existing documents from store`,
+        `[RAG Server] Loaded ${docCount} existing documents from store`,
     );
 
     /**
@@ -204,7 +466,7 @@ async function main() {
      */
     async function removeFile(filePath) {
         try {
-            const indexedDocs = vectorDb.listDocuments();
+            const indexedDocs = await vectorDb.listDocuments();
             const matchingChunks = indexedDocs.filter((id) =>
                 id.startsWith(filePath),
             );
@@ -244,7 +506,9 @@ async function main() {
 
     // Always clear the vector store on startup to ensure fresh indexing
     console.log("[RAG Server] Clearing existing index for fresh reindexing...");
-    const previousCount = vectorDb.listDocuments().length;
+    const previousCount = Array.isArray(vectorDb.listDocuments())
+        ? vectorDb.listDocuments().length
+        : await vectorDb.listDocuments();
     vectorDb.clear();
     await vectorDb.save();
     console.log(`[RAG Server] Cleared ${previousCount} documents from index`);
@@ -298,8 +562,9 @@ async function main() {
 
             // Save once after bulk indexing completes
             await vectorDb.save();
+            const docCount = (await vectorDb.listDocuments()).length;
             console.log(
-                `[RAG Server] Bulk indexing complete. Success: ${successCount}, Failed: ${errorCount}. Total documents in store: ${vectorDb.listDocuments().length}`,
+                `[RAG Server] Bulk indexing complete. Success: ${successCount}, Failed: ${errorCount}. Total documents in store: ${docCount}`,
             );
         } else if (supportedFiles.length > 0 && !apiAvailable) {
             console.log(
@@ -487,7 +752,7 @@ async function main() {
         }
 
         if (name === "index_status") {
-            const docs = vectorDb.listDocuments();
+            const docs = await vectorDb.listDocuments();
             // Extract unique file paths from chunk IDs
             const files = [...new Set(docs.map((id) => id.split("#")[0]))];
             return {
@@ -501,7 +766,7 @@ async function main() {
         }
 
         if (name === "list_indexed_files") {
-            const docs = vectorDb.listDocuments();
+            const docs = await vectorDb.listDocuments();
             // Extract unique file paths, then get just the filename using path.basename
             const files = [
                 ...new Set(docs.map((id) => path.basename(id.split("#")[0]))),
@@ -523,7 +788,7 @@ async function main() {
                 );
 
                 // Clear existing index
-                const previousCount = vectorDb.listDocuments().length;
+                const previousCount = (await vectorDb.listDocuments()).length;
                 vectorDb.clear();
                 await vectorDb.save();
                 console.log(
@@ -593,11 +858,13 @@ async function main() {
                 // Save once after reindex completes
                 await vectorDb.save();
 
+                const finalDocCount = (await vectorDb.listDocuments()).length;
+
                 const result = {
                     successCount,
                     errorCount,
                     totalFiles: supportedFiles.length,
-                    newDocumentCount: vectorDb.listDocuments().length,
+                    newDocumentCount: finalDocCount,
                 };
 
                 if (errorCount > 0) {
@@ -712,12 +979,103 @@ async function main() {
 
     console.log("[RAG Server] ✓ RAG endpoint initialized successfully");
 
-    // Start Server
+    // Start Email Webhook Server for receiving incoming emails via HTTP
+    const emailServer = setupEmailWebhookServer(embeddingEngine, vectorDb);
+
+    // Start IMAP Email Receiving if configured (Gmail integration)
+    if (imapConfigured) {
+        try {
+            const { createIMAPConnection, startIMAPIdle } = EmailService;
+
+            const imapClient = await createIMAPConnection({
+                HOST: CONFIG.IMAP_HOST,
+                PORT: CONFIG.IMAP_PORT,
+                USER: CONFIG.IMAP_USER,
+                PASSWORD: CONFIG.IMAP_PASSWORD,
+                FOLDER: CONFIG.IMAP_FOLDER,
+            });
+
+            // Callback when new email is received via IMAP
+            const handleNewEmail = async (emailData) => {
+                console.log(
+                    "\n[IMAP Service] Processing email through RAG pipeline...",
+                );
+
+                try {
+                    // Generate embedding for the email content
+                    const queryEmbedding =
+                        await embeddingEngine.generateEmbeddings([
+                            emailData.bodyText,
+                        ]);
+
+                    if (!queryEmbedding || queryEmbedding.length === 0) {
+                        throw new Error(
+                            "Failed to generate embedding for email",
+                        );
+                    }
+
+                    // Search vector database for relevant documents
+                    const searchResults = await vectorDb.search(
+                        queryEmbedding[0],
+                        CONFIG.SEARCH_TOP_K,
+                        CONFIG.SEARCH_MIN_SCORE,
+                    );
+
+                    console.log(
+                        `[IMAP Service] Found ${searchResults.length} relevant document chunks`,
+                    );
+
+                    // Format results
+                    const formattedResults = searchResults.map((result) => ({
+                        chunkId: result.chunkId,
+                        documentPath: result.documentPath,
+                        score: result.score,
+                        content: result.content.substring(0, 500),
+                    }));
+
+                    console.log(
+                        "[IMAP Service] Email processed successfully via IMAP",
+                    );
+                } catch (error) {
+                    console.error(
+                        "[IMAP Service] Error processing email through RAG:",
+                        error.message,
+                    );
+                }
+            };
+
+            // Start IDLE monitoring for real-time notifications
+            startIMAPIdle(imapClient, handleNewEmail, CONFIG.EMAIL_SUBJECT_TAG);
+        } catch (error) {
+            console.error(
+                "[RAG Server] Failed to initialize IMAP receiving:",
+                error.message,
+            );
+            console.log("[RAG Server] Continuing without IMAP email receiving");
+        }
+    }
+
+    // Start MCP Server (stdio transport)
     console.log("[RAG Server] Starting MCP server...");
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.log("[RAG Server] ✓ MCP server connected and ready");
 }
+
+// Handle graceful shutdown for IMAP connections
+process.on("SIGINT", () => {
+    console.log("\n[RAG Server] Shutting down...");
+    const { stopIMAPConnection } = EmailService;
+    stopIMAPConnection();
+    process.exit(0);
+});
+
+process.on("SIGTERM", () => {
+    console.log("\n[RAG Server] Shutting down...");
+    const { stopIMAPConnection } = EmailService;
+    stopIMAPConnection();
+    process.exit(0);
+});
 
 main().catch((error) => {
     console.error(`[RAG Server] Fatal error during startup: ${error.message}`);

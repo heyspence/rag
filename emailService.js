@@ -1,5 +1,5 @@
 /**
- * Email Service - AWS SES Integration
+ * Email Service - AWS SES Integration + IMAP Receiving
  *
  * Provides email sending functionality using Amazon Simple Email Service (SES).
  * Supports both single and bulk email sending with optional default recipient feature.
@@ -8,12 +8,23 @@
  * Use generateStyledHTML() or generateSimpleHTML() helper functions to create properly
  * formatted HTML content before calling sendEmail().
  *
+ * ALSO provides IMAP email receiving with IDLE support for real-time notifications.
+ * Uses Gmail's IMAP server to receive emails without third-party services.
+ *
  * Configuration required in .env file:
  *   AWS_ACCESS_KEY_ID=your_access_key_id
  *   AWS_SECRET_ACCESS_KEY=your_secret_access_key
  *   AWS_REGION=us-east-2
  *   FROM_EMAIL=Sender Name <email@domain.com>  (e.g., "My App <noreply@bookservo.com>")
  *   DEFAULT_EMAIL_RECIPIENT=recipient@example.com (optional)
+ *
+ *   # IMAP Receiving Configuration (for Gmail)
+ *   IMAP_HOST=imap.gmail.com
+ *   IMAP_PORT=993
+ *   IMAP_USER=your-email@gmail.com
+ *   IMAP_PASSWORD=app-specific-password  # Generate from Google Account settings
+ *   IMAP_FOLDER=INBOX
+ *   EMAIL_SUBJECT_TAG=[prompt]
  */
 
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
@@ -370,10 +381,328 @@ function getServiceStatus() {
     };
 }
 
+/**
+ * IMAP Email Receiving Service - Gmail Integration with IDLE Support
+ *
+ * Provides real-time email receiving using Gmail's IMAP server.
+ * Uses IDLE mode for push-style notifications instead of polling.
+ * No third-party services required - connects directly to your Gmail account.
+ */
+
+let imap = null;
+let imapConnected = false;
+let idleWatcher = null;
+let processingEmails = new Set(); // Track processed email IDs to avoid duplicates
+
+/**
+ * Initialize IMAP connection with Gmail
+ * @param {Object} config - IMAP configuration
+ * @returns {Promise<Object>} IMAP client instance
+ */
+async function createIMAPConnection(config) {
+    console.log("[IMAP Service] Loading IMAP credentials from environment...");
+
+    if (!config.USER) {
+        throw new Error(
+            "IMAP_USER not found in environment variables. Please check your .env file.",
+        );
+    }
+
+    if (!config.PASSWORD) {
+        throw new Error(
+            "IMAP_PASSWORD not found in environment variables. Please check your .env file.\n" +
+                "Note: For Gmail, you need to generate an App-Specific Password from Google Account settings.",
+        );
+    }
+
+    console.log("[IMAP Service] IMAP_USER:", config.USER);
+    console.log("[IMAP Service] IMAP_PASSWORD present: true");
+    console.log("[IMAP Service] IMAP_HOST:", config.HOST);
+    console.log("[IMAP Service] IMAP_PORT:", config.PORT);
+
+    // Dynamically require imap package (optional dependency)
+    try {
+        imap = require("imap");
+    } catch (error) {
+        throw new Error(
+            "The 'imap' package is not installed. Run: npm install imap node-imap\n" +
+                "This package is required for IMAP email receiving functionality.",
+        );
+    }
+
+    const imapConfig = {
+        user: config.USER,
+        password: config.PASSWORD,
+        host: config.HOST || "imap.gmail.com",
+        port: config.PORT || 993,
+        tls: config.TLS !== false,
+        tlsOptions: {
+            rejectUnauthorized: false, // Gmail self-signed certs during testing
+        },
+    };
+
+    console.log("[IMAP Service] Creating IMAP connection...");
+
+    const imapClient = new imap(imapConfig);
+
+    return imapClient;
+}
+
+/**
+ * Start IMAP IDLE monitoring for real-time email notifications
+ * @param {Object} imapClient - Connected IMAP client instance
+ * @param {Function} onNewEmail - Callback function when new email is received
+ * @param {string} subjectTag - Subject tag to filter emails (e.g., "[prompt]")
+ */
+function startIMAPIdle(imapClient, onNewEmail, subjectTag = "[prompt]") {
+    console.log("[IMAP Service] Starting IDLE monitoring...");
+
+    imapClient.on("ready", () => {
+        console.log("[IMAP Service] ✓ IMAP connection ready");
+
+        // Open INBOX folder
+        imapClient.openBox("INBOX", false, (err, box) => {
+            if (err) {
+                console.error("[IMAP Service] Error opening INBOX:", err);
+                return;
+            }
+
+            console.log(
+                `[IMAP Service] ✓ Opened INBOX (${box.messages.total} total messages)`,
+            );
+
+            // Start IDLE mode for push notifications
+            startIdleWatcher(imapClient, onNewEmail, subjectTag);
+        });
+    });
+
+    imapClient.on("error", (err) => {
+        console.error("[IMAP Service] IMAP connection error:", err.message);
+        imapConnected = false;
+    });
+
+    imapClient.on("close", () => {
+        console.log("[IMAP Service] IMAP connection closed");
+        imapConnected = false;
+    });
+
+    imapClient.connect();
+}
+
+/**
+ * Start IDLE watcher for real-time email notifications
+ */
+function startIdleWatcher(imapClient, onNewEmail, subjectTag) {
+    idleWatcher = imapClient.idle();
+
+    idleWatcher.on("idle", () => {
+        console.log(
+            "[IMAP Service] ✓ IDLE mode active - waiting for new emails",
+        );
+    });
+
+    idleWatcher.on("update", async (seqno, updateType) => {
+        if (updateType === "exists") {
+            console.log(
+                `[IMAP Service] New email detected in INBOX (total: ${seqno})`,
+            );
+
+            // Fetch the new message
+            await fetchAndProcessNewEmail(imapClient, onNewEmail, subjectTag);
+        }
+    });
+
+    idleWatcher.on("error", (err) => {
+        console.error("[IMAP Service] IDLE error:", err.message);
+    });
+}
+
+/**
+ * Fetch and process new email
+ */
+async function fetchAndProcessNewEmail(imapClient, onNewEmail, subjectTag) {
+    try {
+        // Search for unread emails with the target subject tag
+        imapClient.search(
+            ["UNSEEN", "BODY", `SUBJECT "${subjectTag}"`],
+            async (err, results) => {
+                if (err) {
+                    console.error("[IMAP Service] Search error:", err.message);
+                    return;
+                }
+
+                if (!results || results.length === 0) {
+                    console.log("[IMAP Service] No new matching emails found");
+                    return;
+                }
+
+                console.log(
+                    `[IMAP Service] Found ${results.length} new email(s) with tag [${subjectTag}]`,
+                );
+
+                for (const uid of results) {
+                    // Skip if already processed
+                    if (processingEmails.has(uid)) {
+                        continue;
+                    }
+
+                    processingEmails.add(uid);
+
+                    try {
+                        const fetch = imapClient.fetch([uid], {
+                            bodies: "",
+                            markSeen: false,
+                            struct: true,
+                        });
+
+                        fetch.on("message", (msg) => {
+                            msg.on("body", async (stream) => {
+                                let emailData = "";
+                                stream.on("data", (chunk) => {
+                                    emailData += chunk.toString();
+                                });
+
+                                stream.once("end", () => {
+                                    // Parse email content
+                                    const parsedEmail =
+                                        parseRawEmail(emailData);
+
+                                    console.log(
+                                        `[IMAP Service] Email from: ${parsedEmail.from}`,
+                                    );
+                                    console.log(
+                                        `[IMAP Service] Subject: ${parsedEmail.subject}`,
+                                    );
+
+                                    // Mark as processed and trigger callback
+                                    onNewEmail(parsedEmail);
+
+                                    // Optionally mark as read after processing
+                                    imapClient.addFlags([uid], "\\Seen", () => {
+                                        console.log(
+                                            "[IMAP Service] ✓ Email marked as read",
+                                        );
+                                    });
+                                });
+                            });
+                        });
+
+                        fetch.once("error", (err) => {
+                            console.error(
+                                "[IMAP Service] Fetch error:",
+                                err.message,
+                            );
+                        });
+                    } finally {
+                        // Remove from processing set after delay
+                        setTimeout(() => {
+                            processingEmails.delete(uid);
+                        }, 30000);
+                    }
+                }
+
+                // Resume IDLE after processing
+                if (!idleWatcher || idleWatcher._destroyed) {
+                    startIdleWatcher(imapClient, onNewEmail, subjectTag);
+                }
+            },
+        );
+    } catch (error) {
+        console.error("[IMAP Service] Error fetching email:", error.message);
+    }
+}
+
+/**
+ * Parse raw RFC822 email data into structured format
+ */
+function parseRawEmail(rawEmail) {
+    const lines = rawEmail.split("\r\n");
+    let headers = {};
+    let bodyStartIndex = 0;
+    let inHeaders = true;
+
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i] === "") {
+            inHeaders = false;
+            bodyStartIndex = i + 1;
+            break;
+        }
+
+        const colonIndex = lines[i].indexOf(":");
+        if (colonIndex > 0 && inHeaders) {
+            const key = lines[i].substring(0, colonIndex).toLowerCase().trim();
+            const value = lines[i]
+                .substring(colonIndex + 1)
+                .trim()
+                .replace(/^"|"$/g, ""); // Remove quotes
+            headers[key] = value;
+        }
+    }
+
+    const body = lines.slice(bodyStartIndex).join("\n").trim();
+
+    return {
+        from: headers.from || "Unknown",
+        to: headers.to || "",
+        subject: headers.subject || "No Subject",
+        date: headers.date || new Date().toISOString(),
+        bodyText: body,
+        raw: rawEmail,
+    };
+}
+
+/**
+ * Stop IMAP IDLE monitoring and close connection
+ */
+function stopIMAPConnection() {
+    if (idleWatcher) {
+        console.log("[IMAP Service] Stopping IDLE watcher...");
+        try {
+            idleWatcher.done(() => {
+                console.log(
+                    "[IMAP Service] ✓ IDLE watcher stopped successfully",
+                );
+            });
+        } catch (err) {
+            console.error("[IMAP Service] Error stopping IDLE:", err.message);
+        }
+    }
+
+    if (imap && imapConnected) {
+        console.log("[IMAP Service] Closing IMAP connection...");
+        try {
+            imap.end();
+            imapConnected = false;
+        } catch (err) {
+            console.error(
+                "[IMAP Service] Error closing connection:",
+                err.message,
+            );
+        }
+    }
+
+    console.log("[IMAP Service] IMAP service stopped");
+}
+
+/**
+ * Get IMAP connection status
+ */
+function getIMAPStatus() {
+    return {
+        connected: imapConnected,
+        hasConfig: !!(imap?.user && imap?.password),
+    };
+}
+
 module.exports = {
     sendEmail,
     isValidEmail,
     getServiceStatus,
     generateStyledHTML,
     generateSimpleHTML,
+    // IMAP Receiving functions
+    createIMAPConnection,
+    startIMAPIdle,
+    stopIMAPConnection,
+    getIMAPStatus,
 };
