@@ -36,9 +36,8 @@ const CONFIG = {
         parseInt(process.env.RAG_INDEXING_CONCURRENCY, 10) || 5,
     SEARCH_TOP_K: parseInt(process.env.RAG_SEARCH_TOP_K, 10) || 10,
     SEARCH_MIN_SCORE: parseFloat(process.env.RAG_SEARCH_MIN_SCORE) || 0.5,
-    REINDEX_ON_STARTUP:
-        process.env.REINDEX_ON_STARTUP === "true" ||
-        process.env.REINDEX_ON_STARTUP === "1",
+    // Always reindex from scratch on every restart
+    ALWAYS_REINDEX_ON_STARTUP: true,
 };
 
 /**
@@ -243,18 +242,12 @@ async function main() {
         "[RAG Server] Starting initial bulk indexing of existing documents...",
     );
 
-    // If REINDEX_ON_STARTUP is enabled, clear the vector store first
-    if (CONFIG.REINDEX_ON_STARTUP) {
-        console.log(
-            "[RAG Server] REINDEX_ON_STARTUP enabled - clearing existing index...",
-        );
-        const previousCount = vectorDb.listDocuments().length;
-        vectorDb.clear();
-        await vectorDb.save();
-        console.log(
-            `[RAG Server] Cleared ${previousCount} documents from index`,
-        );
-    }
+    // Always clear the vector store on startup to ensure fresh indexing
+    console.log("[RAG Server] Clearing existing index for fresh reindexing...");
+    const previousCount = vectorDb.listDocuments().length;
+    vectorDb.clear();
+    await vectorDb.save();
+    console.log(`[RAG Server] Cleared ${previousCount} documents from index`);
 
     try {
         const existingFiles = await getAllFiles(CONFIG.DOCUMENTS_FOLDER);
