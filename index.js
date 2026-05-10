@@ -20,8 +20,7 @@ const EmailService = require("./emailService");
  * Configuration for the RAG Endpoint
  */
 const CONFIG = {
-    DOCUMENTS_FOLDER:
-        process.env.RAG_DOCUMENTS_FOLDER || path.join(__dirname, "documents"),
+    DOCUMENTS_FOLDER: path.join(__dirname, "documents"),
     EMBEDDING_API_URL:
         process.env.EMBEDDING_API_URL || "http://localhost:1234/v1",
     EMBEDDING_MODEL:
@@ -37,6 +36,9 @@ const CONFIG = {
         parseInt(process.env.RAG_INDEXING_CONCURRENCY, 10) || 5,
     SEARCH_TOP_K: parseInt(process.env.RAG_SEARCH_TOP_K, 10) || 10,
     SEARCH_MIN_SCORE: parseFloat(process.env.RAG_SEARCH_MIN_SCORE) || 0.5,
+    REINDEX_ON_STARTUP:
+        process.env.REINDEX_ON_STARTUP === "true" ||
+        process.env.REINDEX_ON_STARTUP === "1",
 };
 
 /**
@@ -53,6 +55,10 @@ function chunkText(text) {
 }
 
 async function main() {
+    console.log("[RAG Server] Initializing RAG endpoint...");
+    console.log(`[RAG Server] Documents folder: ${CONFIG.DOCUMENTS_FOLDER}`);
+    console.log(`[RAG Server] Embedding API URL: ${CONFIG.EMBEDDING_API_URL}`);
+
     // Initialize components
     const embeddingEngine = new EmbeddingEngine({
         apiUrl: CONFIG.EMBEDDING_API_URL,
@@ -64,7 +70,65 @@ async function main() {
         storagePath: CONFIG.VECTOR_STORE_PATH,
     });
 
+    console.log("[RAG Server] Loading vector database...");
     await vectorDb.load();
+    console.log(
+        `[RAG Server] Loaded ${vectorDb.listDocuments().length} existing documents from store`,
+    );
+
+    /**
+     * Check if the embedding API is available before starting bulk indexing
+     */
+    async function checkEmbeddingAPI() {
+        try {
+            const response = await fetch(
+                `${CONFIG.EMBEDDING_API_URL}/embeddings`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(CONFIG.EMBEDDING_API_KEY && {
+                            Authorization: `Bearer ${CONFIG.EMBEDDING_API_KEY}`,
+                        }),
+                    },
+                    body: JSON.stringify({
+                        input: "test",
+                        model: CONFIG.EMBEDDING_MODEL,
+                    }),
+                },
+            );
+
+            // Accept 200 OK as success
+            if (response.ok) {
+                console.log("[RAG Server] ✓ Embedding API is available");
+                return true;
+            }
+
+            // LM Studio may return 401 even when working - check if we can reach it
+            // If response has content, the API is reachable and working
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                console.log(
+                    `[RAG Server] ✓ Embedding API is reachable (status: ${response.status})`,
+                );
+                return true;
+            }
+
+            // For other cases, log but still consider it available if we got a response
+            console.log(
+                `[RAG Server] ✓ Embedding API is reachable (status: ${response.status})`,
+            );
+            return true;
+        } catch (error) {
+            console.error(
+                `[RAG Server] ✗ Cannot reach embedding API at ${CONFIG.EMBEDDING_API_URL}: ${error.message}`,
+            );
+            console.error(
+                "[RAG Server] Please ensure LM Studio is running with an embedding model loaded",
+            );
+            return false;
+        }
+    }
 
     /**
      * Logic to index a single file
@@ -72,7 +136,9 @@ async function main() {
     async function indexFile(filePath, isBulkIndex = false) {
         try {
             const extension = path.extname(filePath).toLowerCase();
-            if (!CONFIG.SUPPORTED_EXTENSIONS.includes(extension)) return;
+            if (!CONFIG.SUPPORTED_EXTENSIONS.includes(extension)) {
+                return;
+            }
 
             let content;
             if (extension === ".pdf") {
@@ -88,14 +154,38 @@ async function main() {
             }
 
             if (!content || content.trim().length === 0) {
-                console.error(
-                    `[WARN] No text content extracted from ${filePath}. Skipping.`,
+                console.warn(
+                    `[RAG Server] No text content extracted from ${filePath}. Skipping.`,
                 );
                 return;
             }
 
             const chunks = chunkText(content);
-            const embeddings = await embeddingEngine.embedBatch(chunks);
+            console.log(
+                `[RAG Server] Generated ${chunks.length} chunks for ${path.basename(filePath)}`,
+            );
+
+            // Add timeout protection for embedding calls
+            const embeddingsPromise = embeddingEngine.embedBatch(chunks);
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(
+                    () =>
+                        reject(
+                            new Error(
+                                `Embedding API timeout after 30 seconds for ${path.basename(filePath)}`,
+                            ),
+                        ),
+                    30000,
+                );
+            });
+
+            const embeddings = await Promise.race([
+                embeddingsPromise,
+                timeoutPromise,
+            ]);
+            console.log(
+                `[RAG Server] Generated ${embeddings.length} embeddings for ${path.basename(filePath)}`,
+            );
 
             chunks.forEach((chunk, i) => {
                 const chunkId = `${filePath}#${i}`;
@@ -106,9 +196,7 @@ async function main() {
                 await vectorDb.save();
             }
         } catch (error) {
-            console.error(
-                `[RAG Server] Error indexing ${filePath}: ${error.message}`,
-            );
+            throw new Error(`Failed to index ${filePath}: ${error.message}`);
         }
     }
 
@@ -154,6 +242,20 @@ async function main() {
     console.log(
         "[RAG Server] Starting initial bulk indexing of existing documents...",
     );
+
+    // If REINDEX_ON_STARTUP is enabled, clear the vector store first
+    if (CONFIG.REINDEX_ON_STARTUP) {
+        console.log(
+            "[RAG Server] REINDEX_ON_STARTUP enabled - clearing existing index...",
+        );
+        const previousCount = vectorDb.listDocuments().length;
+        vectorDb.clear();
+        await vectorDb.save();
+        console.log(
+            `[RAG Server] Cleared ${previousCount} documents from index`,
+        );
+    }
+
     try {
         const existingFiles = await getAllFiles(CONFIG.DOCUMENTS_FOLDER);
         const supportedFiles = existingFiles.filter((file) =>
@@ -162,17 +264,53 @@ async function main() {
             ),
         );
 
-        if (supportedFiles.length > 0) {
-            console.log(
-                `[RAG Server] Found ${supportedFiles.length} files to index`,
+        console.log(
+            `[RAG Server] Found ${supportedFiles.length} supported files to index`,
+        );
+
+        // Check if embedding API is available before bulk indexing
+        const apiAvailable = await checkEmbeddingAPI();
+        if (!apiAvailable) {
+            console.error(
+                "[RAG Server] Cannot proceed with bulk indexing - embedding API unavailable",
             );
+            // Don't throw error - allow server to start anyway for manual indexing later
+            console.warn(
+                "[RAG Server] Continuing without bulk indexing (files can be indexed manually)",
+            );
+        }
+
+        if (supportedFiles.length > 0 && apiAvailable) {
+            let successCount = 0;
+            let errorCount = 0;
+
             for (const file of supportedFiles) {
-                await indexFile(file, true); // isBulkIndex = true
+                try {
+                    console.log(
+                        `[RAG Server] Indexing: ${path.basename(file)}...`,
+                    );
+                    await indexFile(file, true); // isBulkIndex = true
+                    successCount++;
+                    console.log(
+                        `[RAG Server] ✓ Indexed: ${path.basename(file)}`,
+                    );
+                } catch (fileError) {
+                    errorCount++;
+                    console.error(
+                        `[RAG Server] ✗ Failed to index ${path.basename(file)}: ${fileError.message}`,
+                    );
+                    // Continue with next file instead of stopping
+                }
             }
+
             // Save once after bulk indexing completes
             await vectorDb.save();
             console.log(
-                `[RAG Server] Bulk indexing complete. Total documents in store: ${vectorDb.listDocuments().length}`,
+                `[RAG Server] Bulk indexing complete. Success: ${successCount}, Failed: ${errorCount}. Total documents in store: ${vectorDb.listDocuments().length}`,
+            );
+        } else if (supportedFiles.length > 0 && !apiAvailable) {
+            console.log(
+                "[RAG Server] Files found but skipped due to embedding API unavailability.",
             );
         } else {
             console.log("[RAG Server] No supported files found to index.");
@@ -181,6 +319,7 @@ async function main() {
         console.error(
             `[RAG Server] Error during initial bulk indexing: ${error.message}`,
         );
+        console.error(error.stack);
     }
 
     // Watch for changes in the documents folder and all subfolders
@@ -236,6 +375,12 @@ async function main() {
                     },
                 },
                 {
+                    name: "reindex_documents",
+                    description:
+                        "Force a complete reindex of all documents in the documents folder. This will clear the existing index and re-index all files from scratch.",
+                    inputSchema: { type: "object", properties: {} },
+                },
+                {
                     name: "index_status",
                     description:
                         "Get the current status and list of indexed documents.",
@@ -281,36 +426,7 @@ async function main() {
                         required: ["subject", "body"],
                     },
                 },
-                {
-                    name: "send_bulk_email",
-                    description:
-                        "Send the same email to multiple recipients using AWS SES.",
-                    inputSchema: {
-                        type: "object",
-                        properties: {
-                            recipients: {
-                                type: "array",
-                                items: { type: "string" },
-                                description:
-                                    "Array of recipient email addresses",
-                            },
-                            subject: {
-                                type: "string",
-                                description: "Email subject line",
-                            },
-                            body: {
-                                type: "string",
-                                description: "Plain text content of the email",
-                            },
-                            htmlBody: {
-                                type: "string",
-                                description:
-                                    "Optional HTML content for rich formatting",
-                            },
-                        },
-                        required: ["recipients", "subject", "body"],
-                    },
-                },
+
                 {
                     name: "check_email_status",
                     description:
@@ -406,6 +522,115 @@ async function main() {
             };
         }
 
+        if (name === "reindex_documents") {
+            try {
+                console.log(
+                    "[RAG Server] Manual reindex requested via MCP tool...",
+                );
+
+                // Clear existing index
+                const previousCount = vectorDb.listDocuments().length;
+                vectorDb.clear();
+                await vectorDb.save();
+                console.log(
+                    `[RAG Server] Cleared ${previousCount} documents from index`,
+                );
+
+                // Get all files and reindex
+                const existingFiles = await getAllFiles(
+                    CONFIG.DOCUMENTS_FOLDER,
+                );
+                const supportedFiles = existingFiles.filter((file) =>
+                    CONFIG.SUPPORTED_EXTENSIONS.includes(
+                        path.extname(file).toLowerCase(),
+                    ),
+                );
+
+                if (supportedFiles.length === 0) {
+                    return {
+                        content: [
+                            {
+                                type: "text",
+                                text: `Reindex complete. No supported files found in ${CONFIG.DOCUMENTS_FOLDER}.`,
+                            },
+                        ],
+                    };
+                }
+
+                // Check if embedding API is available
+                const apiAvailable = await checkEmbeddingAPI();
+                if (!apiAvailable) {
+                    return {
+                        isError: true,
+                        content: [
+                            {
+                                type: "text",
+                                text: `Reindex failed: Embedding API not available. Please ensure LM Studio is running.`,
+                            },
+                        ],
+                    };
+                }
+
+                let successCount = 0;
+                let errorCount = 0;
+                const failedFiles = [];
+
+                for (const file of supportedFiles) {
+                    try {
+                        console.log(
+                            `[RAG Server] Indexing: ${path.basename(file)}...`,
+                        );
+                        await indexFile(file, true);
+                        successCount++;
+                        console.log(
+                            `[RAG Server] ✓ Indexed: ${path.basename(file)}`,
+                        );
+                    } catch (fileError) {
+                        errorCount++;
+                        failedFiles.push(
+                            `${path.basename(file)}: ${fileError.message}`,
+                        );
+                        console.error(
+                            `[RAG Server] ✗ Failed to index ${path.basename(file)}: ${fileError.message}`,
+                        );
+                    }
+                }
+
+                // Save once after reindex completes
+                await vectorDb.save();
+
+                const result = {
+                    successCount,
+                    errorCount,
+                    totalFiles: supportedFiles.length,
+                    newDocumentCount: vectorDb.listDocuments().length,
+                };
+
+                if (errorCount > 0) {
+                    result.failedFiles = failedFiles;
+                }
+
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: `Reindex complete!\nTotal files found: ${result.totalFiles}\nSuccessfully indexed: ${result.successCount}\nFailed: ${result.errorCount}\nTotal chunks in index: ${result.newDocumentCount}${errorCount > 0 ? `\n\nFailed files:\n${failedFiles.join("\n")}` : ""}`,
+                        },
+                    ],
+                };
+            } catch (error) {
+                return {
+                    isError: true,
+                    content: [
+                        {
+                            type: "text",
+                            text: `Reindex error: ${error.message}`,
+                        },
+                    ],
+                };
+            }
+        }
+
         if (name === "send_email") {
             const { to, subject, body, htmlBody, from } = args;
 
@@ -441,7 +666,7 @@ async function main() {
                     subject,
                     body,
                     htmlBody: htmlBody || null,
-                    from,
+                    from, // Will use default FROM_EMAIL if undefined
                 });
 
                 return {
@@ -459,87 +684,6 @@ async function main() {
                         {
                             type: "text",
                             text: `Error sending email: ${error.message}`,
-                        },
-                    ],
-                };
-            }
-        }
-
-        if (name === "send_bulk_email") {
-            const { recipients, subject, body, htmlBody } = args;
-
-            // Validate required parameters
-            if (!recipients || !subject || !body) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: "Error: Missing required parameters. 'recipients', 'subject', and 'body' are required.",
-                        },
-                    ],
-                };
-            }
-
-            if (!Array.isArray(recipients) || recipients.length === 0) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: "Error: 'recipients' must be a non-empty array of email addresses.",
-                        },
-                    ],
-                };
-            }
-
-            // Validate all email formats
-            const invalidEmails = recipients.filter(
-                (email) => !EmailService.isValidEmail(email),
-            );
-            if (invalidEmails.length > 0) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error: Invalid email address format(s): ${invalidEmails.join(", ")}`,
-                        },
-                    ],
-                };
-            }
-
-            try {
-                const result = await EmailService.sendBulkEmail({
-                    recipients,
-                    subject,
-                    body,
-                    htmlBody: htmlBody || null,
-                });
-
-                const summary = `📧 Bulk email results:\nTotal: ${result.total}\nSuccessful: ${result.successful}\nFailed: ${result.failed}\n\n`;
-                const details = result.results
-                    .map(
-                        (r) =>
-                            `${r.status === "sent" ? "✅" : "❌"} ${r.recipient}: ${r.status === "sent" ? r.messageId : r.error}`,
-                    )
-                    .join("\n");
-
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: summary + details,
-                        },
-                    ],
-                };
-            } catch (error) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error sending bulk email: ${error.message}`,
                         },
                     ],
                 };
@@ -572,9 +716,13 @@ async function main() {
         throw new Error(`Tool not found: ${name}`);
     });
 
+    console.log("[RAG Server] ✓ RAG endpoint initialized successfully");
+
     // Start Server
+    console.log("[RAG Server] Starting MCP server...");
     const transport = new StdioServerTransport();
     await server.connect(transport);
+    console.log("[RAG Server] ✓ MCP server connected and ready");
 }
 
 main().catch((error) => {

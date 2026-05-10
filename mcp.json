@@ -1,11 +1,26 @@
 {
-  "mcpServers": {
-    "local-rag": {
-      "command": "node",
-      "args": ["/absolute/path/to/rag_endpoint/index.js"],
-      "env": {
-        "EMBEDDING_API_KEY": "${ENV:EMBEDDING_API_KEY}"
-      }
+    "mcpServers": {
+        "local-rag": {
+            "command": "node",
+            "args": ["index.js"],
+            "env": {
+                "EMBEDDING_API_KEY": "${ENV:EMBEDDING_API_KEY}",
+                "AWS_ACCESS_KEY_ID": "${ENV:AWS_ACCESS_KEY_ID}",
+                "AWS_SECRET_ACCESS_KEY": "${ENV:AWS_SECRET_ACCESS_KEY}",
+                "AWS_REGION": "us-west-2",
+                "FROM_EMAIL": "noreply@example.com",
+                "DEFAULT_EMAIL_RECIPIENT": "admin@example.com"
+            },
+            "description": "Local RAG endpoint server for document retrieval and embedding operations"
+        },
+        "filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "./documents"
+            ],
+            "description": "Filesystem access for the documents directory"
+        }
     }
-  }
 }

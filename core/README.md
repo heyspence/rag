@@ -72,6 +72,28 @@ rag_endpoint/
 
 **Solution**: Added bulk indexing logic that runs before the file watcher starts:
 
+### Complete Reindex Options
+
+There are now two ways to ensure all files get reindexed:
+
+#### Option 1: Automatic Reindex on Every Startup
+
+Set `REINDEX_ON_STARTUP=true` in your `.env` file. This will:
+1. Clear the existing vector store completely
+2. Re-index all files from scratch on every server restart
+3. Ensure no stale data remains in the index
+
+**Use Case**: When you want guaranteed fresh indexing every time (e.g., during development or when document content changes frequently).
+
+#### Option 2: Manual Reindex via MCP Tool
+
+Use the `reindex_documents` tool to trigger a complete reindex without restarting:
+- Clears existing index
+- Re-indexes all files in the documents folder
+- Returns success/failure counts for each file
+
+**Use Case**: When you need to refresh the index on-demand without server restart.
+
 ```javascript
 // Initial Indexing on startup
 console.log("[RAG Server] Starting initial bulk indexing of existing documents...");
@@ -114,6 +136,9 @@ EMBEDDING_API_URL=http://localhost:1234/v1
 EMBEDDING_MODEL=text-embedding-nomic-embed-text-v1.5
 VECTOR_STORE_PATH=./vector_store.json
 
+# Optional: Force complete reindex on every startup
+REINDEX_ON_STARTUP=false  # Set to "true" or "1" to clear and reindex all files at restart
+
 # AWS SES Email Configuration (API credentials, NOT SMTP)
 AWS_REGION=us-east-2
 AWS_ACCESS_KEY_ID=AKIAxxxxxxxxxxxxxxxx
@@ -137,6 +162,7 @@ AWS_FROM_EMAIL=noreply@bookservo.com
 | `search_documents` | Semantic search through indexed documents | `query`, `topK` |
 | `index_status` | Get indexing statistics | None |
 | `list_indexed_files` | List all indexed file names | None |
+| `reindex_documents` | Force complete reindex (clears and rebuilds index) | None |
 
 ---
 
@@ -177,20 +203,26 @@ Always read these files first to understand the current state:
 #### Adding New Document Types
 1. Add extension to `CONFIG.SUPPORTED_EXTENSIONS` in `index.js`
 2. Add processing logic in `indexFile()` function for new format
-3. Test with `index_status` tool to verify chunk counts
+3. Test with `reindex_documents` tool or restart server to apply changes
 4. Update this README's supported extensions list
 
 #### Modifying Embedding Behavior
 1. Edit `embeddingEngine.js` for core logic
 2. Update `vectorDatabase.js` if storage schema changes
-3. Clear `vector_store.json` and restart to re-index with new settings
+3. Use `reindex_documents` MCP tool to rebuild index with new settings (no manual file deletion needed)
 4. Test with `index_status` tool to verify chunk counts
+
+#### Force Complete Reindex
+1. **On Startup**: Set `REINDEX_ON_STARTUP=true` in `.env`, then restart server
+2. **On Demand**: Call `reindex_documents` MCP tool from LM Studio
+3. Both methods clear existing index before re-indexing all files
 
 #### Debugging Indexing Issues
 1. Check console output during startup for "Bulk indexing complete" message
 2. Verify `documents/` folder contains supported file types (`.txt`, `.md`, `.pdf`)
 3. Confirm `EMBEDDING_API_URL` is reachable (LM Studio must be running)
 4. Use `index_status` MCP tool to verify documents are indexed
+5. If index appears stale, use `reindex_documents` tool or set `REINDEX_ON_STARTUP=true`
 
 ---
 
