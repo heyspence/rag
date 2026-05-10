@@ -395,7 +395,7 @@ async function main() {
                 {
                     name: "send_email",
                     description:
-                        "Send an email using AWS SES. Requires subject and body parameters. The 'to' parameter is optional - if not provided, the email will be sent to the default recipient configured in .env (DEFAULT_EMAIL_RECIPIENT).",
+                        "Send an email using AWS SES. ALL emails MUST be sent as styled HTML documents for professional formatting. Requires subject and body parameters. The 'to' parameter is optional - if not provided, the email will be sent to the default recipient configured in .env (DEFAULT_EMAIL_RECIPIENT). Always generate htmlBody with proper HTML structure including inline CSS styles.",
                     inputSchema: {
                         type: "object",
                         properties: {
@@ -410,12 +410,13 @@ async function main() {
                             },
                             body: {
                                 type: "string",
-                                description: "Plain text content of the email",
+                                description:
+                                    "Plain text fallback content (will be auto-generated if not provided, but htmlBody is required for styled emails)",
                             },
                             htmlBody: {
                                 type: "string",
                                 description:
-                                    "Optional HTML content for rich formatting",
+                                    'REQUIRED: Styled HTML content with inline CSS. Must include proper HTML structure (<html>, <head>, <body>) with inline styles for email client compatibility. Example: \'<html><head><style>body{font-family:Arial,sans-serif;}</style></head><body style="margin:0;padding:20px;font-family:Arial,sans-serif;"><h1 style="color:#333;">Subject</h1><p style="line-height:1.6;">Content here...</p></body></html>\'',
                             },
                             from: {
                                 type: "string",
@@ -423,7 +424,7 @@ async function main() {
                                     "Sender email address (defaults to noreply@bookservo.com)",
                             },
                         },
-                        required: ["subject", "body"],
+                        required: ["subject", "body", "htmlBody"],
                     },
                 },
 
@@ -635,13 +636,13 @@ async function main() {
             const { to, subject, body, htmlBody, from } = args;
 
             // Validate required parameters (to is optional - will use default if not provided)
-            if (!subject || !body) {
+            if (!subject || !body || !htmlBody) {
                 return {
                     isError: true,
                     content: [
                         {
                             type: "text",
-                            text: "Error: Missing required parameters. 'subject' and 'body' are required.",
+                            text: "Error: Missing required parameters. 'subject', 'body', and 'htmlBody' are all required. ALL emails must be sent as styled HTML documents.",
                         },
                     ],
                 };
@@ -665,7 +666,7 @@ async function main() {
                     to,
                     subject,
                     body,
-                    htmlBody: htmlBody || null,
+                    htmlBody, // Required for styled HTML emails
                     from, // Will use default FROM_EMAIL if undefined
                 });
 

@@ -64,6 +64,21 @@ rag_endpoint/
                           [vectorDatabase.upsertDocument()] → [vector_store.json]
 ```
 
+### Email Formatting Requirements (Updated 2026-05-10)
+**ALL emails must be sent as styled HTML documents**. The `send_email` tool now requires the `htmlBody` parameter.
+
+**Changes Made**:
+1. Updated `send_email` tool schema to require `htmlBody` parameter
+2. Added helper functions: `generateStyledHTML()` and `generateSimpleHTML()` in `emailService.js`
+3. Updated validation to reject emails without HTML content
+4. Enhanced documentation with HTML generation examples
+
+**Why This Matters**:
+- Professional appearance for all outgoing emails
+- Better compatibility across email clients (Gmail, Outlook, Apple Mail)
+- Inline CSS ensures styles render correctly everywhere
+- Supports rich formatting: colors, fonts, layouts, and spacing
+
 ### Startup Sequence (Fixed)
 
 **Issue Fixed (2026-05-10)**: Files were not being indexed automatically on startup with LM Studio.
@@ -163,6 +178,7 @@ AWS_FROM_EMAIL=noreply@bookservo.com
 | `index_status` | Get indexing statistics | None |
 | `list_indexed_files` | List all indexed file names | None |
 | `reindex_documents` | Force complete reindex (clears and rebuilds index) | None |
+| `send_email` | Send styled HTML emails via AWS SES | `subject`, `body`, `htmlBody` (required), `to` (optional), `from` (optional) |
 
 ---
 
@@ -216,6 +232,42 @@ Always read these files first to understand the current state:
 1. **On Startup**: Set `REINDEX_ON_STARTUP=true` in `.env`, then restart server
 2. **On Demand**: Call `reindex_documents` MCP tool from LM Studio
 3. Both methods clear existing index before re-indexing all files
+
+#### Sending Styled HTML Emails
+**IMPORTANT**: All emails MUST be sent as styled HTML documents for professional formatting.
+
+1. **Required Parameters**: When calling `send_email`, you must provide:
+   - `subject`: Email subject line
+   - `body`: Plain text fallback content
+   - `htmlBody`: Styled HTML content with inline CSS (REQUIRED)
+
+2. **Generating HTML Content**: Use the helper functions in `emailService.js`:
+   ```javascript
+   // Option 1: Professional styled template
+   const html = EmailService.generateStyledHTML({
+       title: "Your Subject Here",
+       content: "<p>Your main content here...</p>",
+       footer: "This email was sent automatically.",
+       primaryColor: "#2563eb"
+   });
+
+   // Option 2: Simple styled HTML
+   const html = EmailService.generateSimpleHTML("Subject", "Plain text body");
+   ```
+
+3. **Example Usage**:
+   ```javascript
+   await EmailService.sendEmail({
+       to: "recipient@example.com",
+       subject: "Meeting Reminder",
+       body: "This is a reminder for our meeting tomorrow.",
+       htmlBody: EmailService.generateStyledHTML({
+           title: "Meeting Reminder",
+           content: "<p>Dear Team,</p><p>This is a reminder for our <strong>meeting tomorrow at 2 PM</strong>.</p>",
+           footer: "Best regards, Your Team"
+       })
+   });
+   ```
 
 #### Debugging Indexing Issues
 1. Check console output during startup for "Bulk indexing complete" message

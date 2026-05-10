@@ -4,6 +4,10 @@
  * Provides email sending functionality using Amazon Simple Email Service (SES).
  * Supports both single and bulk email sending with optional default recipient feature.
  *
+ * IMPORTANT: ALL emails MUST be sent as styled HTML documents for professional formatting.
+ * Use generateStyledHTML() or generateSimpleHTML() helper functions to create properly
+ * formatted HTML content before calling sendEmail().
+ *
  * Configuration required in .env file:
  *   AWS_ACCESS_KEY_ID=your_access_key_id
  *   AWS_SECRET_ACCESS_KEY=your_secret_access_key
@@ -94,9 +98,9 @@ function createSESClient() {
  * @param {Object} params - Email parameters
  * @param {string|string[]} [params.to] - Recipient email address(es). If not provided, uses DEFAULT_EMAIL_RECIPIENT.
  * @param {string} params.subject - Email subject line
- * @param {string} params.body - Plain text content of the email
- * @param {string} [params.htmlBody=null] - Optional HTML content for rich formatting
- * @param {string} [params.from=EMAIL_CONFIG.FROM_EMAIL] - Sender email (format: "Name <email@domain.com>" or just "email@domain.com")
+ * @param {string} params.body - Plain text fallback content (required, but htmlBody is preferred)
+ * @param {string} params.htmlBody - REQUIRED: Styled HTML content for professional email formatting. Use generateStyledHTML() or generateSimpleHTML() helper functions.
+ * @param {string} [params.from=EMAIL_CONFIG.FROM_EMAIL] - Sender email (format: "Name <email@domain.com>" or just "email@domain.com"). Will use default FROM_EMAIL if not provided.
  * @returns {Promise<Object>} - SES send result with messageId and recipient info
  */
 async function sendEmail({ to, subject, body, htmlBody = null, from }) {
@@ -262,6 +266,91 @@ function isValidEmail(email) {
 }
 
 /**
+ * Generate a professionally styled HTML email template
+ * @param {Object} options - Email content options
+ * @param {string} options.title - Main heading/title of the email
+ * @param {string} options.content - Main body content (can include HTML)
+ * @param {string} [options.footer] - Optional footer text
+ * @param {string} [options.primaryColor='#2563eb'] - Primary accent color
+ * @returns {string} Complete styled HTML email document
+ */
+function generateStyledHTML({
+    title,
+    content,
+    footer = "This email was sent automatically. Please do not reply.",
+    primaryColor = "#2563eb",
+}) {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f4f4f5; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                    <tr>
+                        <td style="padding: 30px 40px;">
+                            <h1 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: #1a1a1a; border-bottom: 3px solid ${primaryColor}; padding-bottom: 12px;">${title}</h1>
+                            <div style="font-size: 16px; line-height: 1.7; color: #404040;">${content}</div>
+                        </td>
+                    </tr>
+                    ${
+                        footer
+                            ? `
+                    <tr>
+                        <td style="padding: 20px 40px; background-color: #fafafa; border-top: 1px solid #e5e5e5;">
+                            <p style="margin: 0; font-size: 13px; color: #8c8c8c; text-align: center;">${footer}</p>
+                        </td>
+                    </tr>`
+                            : ""
+                    }
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+}
+
+/**
+ * Generate a simple HTML email with basic styling
+ * @param {string} subject - Email subject for the heading
+ * @param {string} bodyText - Plain text content to convert to HTML paragraphs
+ * @returns {string} Simple styled HTML email document
+ */
+function generateSimpleHTML(subject, bodyText) {
+    // Convert plain text to HTML paragraphs
+    const paragraphs = bodyText
+        .split("\n\n")
+        .map(
+            (para) =>
+                `<p style="margin: 0 0 16px 0; line-height: 1.6;">${para.trim()}</p>`,
+        )
+        .join("");
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #fafafa; font-family: Arial, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); padding: 30px;">
+        <h1 style="margin: 0 0 24px 0; font-size: 22px; color: #333333; border-bottom: 2px solid #0066cc; padding-bottom: 12px;">${subject}</h1>
+        <div style="font-size: 15px; line-height: 1.6; color: #444444;">
+            ${paragraphs}
+        </div>
+    </div>
+</body>
+</html>`;
+}
+
+/**
  * Get the current configuration status of the email service
  * @returns {Object} - Configuration status including region, from email, and credential status
  */
@@ -285,4 +374,6 @@ module.exports = {
     sendEmail,
     isValidEmail,
     getServiceStatus,
+    generateStyledHTML,
+    generateSimpleHTML,
 };
