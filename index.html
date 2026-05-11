@@ -856,7 +856,28 @@
         <footer class="dashboard-footer">
             <p>Email & Agent Management Dashboard | RAG Endpoint v1.0</p>
             <p style="margin-top: 8px;">Powered by Model Context Protocol • Vector Embeddings • AWS SES Integration</p>
+            <p style="margin-top: 12px; color: #fbbf24; font-size: 0.8rem;">⚠️ Configuration changes require server restart to take effect</p>
         </footer>
+    </div>
+
+    <!-- Config Editor Modal -->
+    <div id="configModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #1e293b; border-radius: 16px; padding: 24px; width: 90%; max-width: 800px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #334155;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #334155;">
+                <h2 style="color: #f8fafc; font-size: 1.25rem; margin: 0;">Edit Configuration (.env)</h2>
+                <button class="btn btn-secondary" onclick="closeConfigEditor()" style="padding: 6px 12px; font-size: 0.9rem;">✕</button>
+            </div>
+
+            <div style="flex: 1; overflow: hidden; margin-bottom: 16px;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 12px;">Edit your .env file content below. Changes will be saved immediately but require a server restart to take effect.</p>
+                <textarea id="envContent" style="width: 100%; height: 400px; background: #0f172a; color: #cbd5e1; border: 1px solid #334155; border-radius: 8px; padding: 16px; font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem; resize: none;" spellcheck="false"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeConfigEditor()" style="padding: 10px 20px;">Cancel</button>
+                <button class="btn btn-primary" onclick="saveConfigFromEditor()" style="padding: 10px 20px;">Save Changes</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -890,9 +911,103 @@
                 .catch(err => console.error('Status update failed:', err));
         }
 
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const data = await response.json();
+
+                if (data.success) {
+                    return data.config;
+                } else {
+                    console.error('Failed to load config:', data.message);
+                    return {};
+                }
+            } catch (error) {
+                console.error('Error loading config:', error);
+                return {};
+            }
+        }
+
+        async function saveConfig(configData) {
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ config: configData })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addLogEntry('success', 'Configuration saved successfully');
+                    return true;
+                } else {
+                    console.error('Failed to save config:', data.message);
+                    addLogEntry('error', 'Failed to save configuration: ' + data.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error saving config:', error);
+                addLogEntry('error', 'Error saving configuration');
+                return false;
+            }
+        }
+
+        function openConfigEditor() {
+            loadConfig().then(config => {
+                const modal = document.getElementById('configModal');
+                const textarea = document.getElementById('envContent');
+
+                // Format config as .env file content
+                let envContent = '';
+                for (const [key, value] of Object.entries(config)) {
+                    envContent += `${key}=${value}\n`;
+                }
+
+                textarea.value = envContent.trim();
+                modal.style.display = 'flex';
+            });
+        }
+
+        function closeConfigEditor() {
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        async function saveConfigFromEditor() {
+            const textarea = document.getElementById('envContent');
+            const lines = textarea.value.split('\n');
+            const configData = {};
+
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (trimmedLine && !trimmedLine.startsWith('#')) {
+                    const eqIndex = trimmedLine.indexOf('=');
+                    if (eqIndex > 0) {
+                        const key = trimmedLine.substring(0, eqIndex).trim();
+                        let value = trimmedLine.substring(eqIndex + 1).trim();
+
+                        // Remove surrounding quotes if present
+                        if ((value.startsWith('"') && value.endsWith('"')) ||
+                            (value.startsWith("'") && value.endsWith("'"))) {
+                            value = value.slice(1, -1);
+                        }
+
+                        configData[key] = value;
+                    }
+                }
+            }
+
+            const success = await saveConfig(configData);
+            if (success) {
+                closeConfigEditor();
+                alert('Configuration saved! Please restart the server for changes to take effect.');
+            }
+        }
+
         function editConfig() {
-            console.log('Editing configuration...');
-            alert('Configuration editor would open here with all environment variable settings.');
+            openConfigEditor();
         }
 
         function clearLogs() {
@@ -931,6 +1046,13 @@
 
         // Auto-refresh stats every 30 seconds
         setInterval(refreshStats, 30000);
+
+        // Close modal when clicking outside
+        document.getElementById('configModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeConfigEditor();
+            }
+        });
 
         // Add initial log entry
         addLogEntry('success', 'Dashboard loaded successfully');

@@ -2,6 +2,7 @@ node_modules/
 documents/
 .env
 .env.*
+mcp-secrets.json
 *.log
 npm-debug.log*
 yarn-debug.log*

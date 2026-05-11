@@ -8,8 +8,16 @@
                 "AWS_ACCESS_KEY_ID": "${ENV:AWS_ACCESS_KEY_ID}",
                 "AWS_SECRET_ACCESS_KEY": "${ENV:AWS_SECRET_ACCESS_KEY}",
                 "AWS_REGION": "us-west-2",
-                "FROM_EMAIL": "noreply@example.com",
-                "DEFAULT_EMAIL_RECIPIENT": "admin@example.com"
+                "FROM_EMAIL": "[CHATBOT] <contact@spencerheywood.com>",
+                "DEFAULT_EMAIL_RECIPIENT": "spencer.heywood2000@gmail.com",
+                "EMAIL_SUBJECT_TAG": "${ENV:EMAIL_SUBJECT_TAG}",
+                "GMAIL_PUSH_WEBHOOK_PORT": "${ENV:GMAIL_PUSH_WEBHOOK_PORT}",
+                "GMAIL_PUSH_WEBHOOK_URL": "${ENV:GMAIL_PUSH_WEBHOOK_URL}",
+                "GOOGLE_PROJECT_ID": "${ENV:GOOGLE_PROJECT_ID}",
+                "GOOGLE_CLIENT_ID": "${ENV:GOOGLE_CLIENT_ID}",
+                "GOOGLE_CLIENT_SECRET": "${ENV:GOOGLE_CLIENT_SECRET}",
+                "GOOGLE_PUBSUB_TOPIC_NAME": "${ENV:GOOGLE_PUBSUB_TOPIC_NAME}",
+                "GOOGLE_REFRESH_TOKEN": "${ENV:GOOGLE_REFRESH_TOKEN}"
             },
             "description": "Local RAG endpoint server for document retrieval and embedding operations"
         },

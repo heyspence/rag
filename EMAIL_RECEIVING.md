@@ -1,6 +1,6 @@
 # Email Receiving Setup Guide
 
-This guide explains how to configure your RAG endpoint to receive and process incoming emails via webhook. Emails with a specific subject tag (e.g., `[prompt]`) are automatically processed through the RAG pipeline for document retrieval and analysis.
+This guide explains how to configure your RAG endpoint to receive and process incoming emails. **Gmail Push Notifications** is now the recommended method - no polling, instant delivery when emails arrive! Emails with a specific subject tag (e.g., `[prompt]`) are automatically processed through the RAG pipeline for document retrieval and analysis.
 
 ---
 
@@ -27,6 +27,27 @@ The email receiving feature allows your RAG endpoint to:
 
 ### How It Works
 
+#### Option 1: Gmail Push Notifications (Recommended ⭐)
+
+```
+Email Sender → Gmail → Google Cloud Pub/Sub → Webhook POST → Your Server
+                                                    ↓
+                                          Filter by Subject Tag
+                                                    ↓
+                                  Process Content Through RAG Pipeline
+                                                    ↓
+                                        Return Results via Response
+```
+
+**Benefits:**
+- ✅ **Instant delivery** (sub-second latency)
+- ✅ **No polling overhead** - saves resources and battery
+- ✅ **Official Google API** - production-ready and reliable
+- ✅ **Works through firewalls** - uses HTTPS webhooks
+- ✅ **Free tier available** - no third-party service required
+
+#### Option 2: Webhook Services (Alternative)
+
 ```
 Email Sender → Email Provider (Mailgun/SendGrid/AWS SES) → Webhook POST → Your Server
                                                               ↓
@@ -46,13 +67,27 @@ Before setting up email receiving, ensure you have:
 1. **Node.js** installed (LTS version recommended)
 2. **Dependencies installed**: `npm install`
 3. **Public server access** or use a tunneling service like ngrok for local development
-4. **Email provider account** (Mailgun, SendGrid, AWS SES, etc.)
+
+### For Gmail Push Notifications (Recommended):
+- Google Cloud account (free tier available)
+- Gmail address with IMAP enabled
+- ~10 minutes to configure OAuth and Pub/Sub
+
+### For Webhook Services (Alternative):
+- Email provider account (Mailgun, SendGrid, AWS SES, etc.)
 
 ---
 
 ## Configuration
 
-### 1. Environment Variables
+### Quick Start: Gmail Push Notifications (Recommended ⭐)
+
+For instant, real-time email delivery with no polling, see the dedicated setup guide:
+
+👉 **[Gmail Push Setup Guide](docs/GMAIL_PUSH_SETUP.md)** - Complete walkthrough  
+👉 **[Quick Start Guide](docs/PUSH_QUICKSTART.md)** - Get started in 10 minutes
+
+### Basic Configuration (Required for All Methods)
 
 Copy `.env.example` to `.env` and configure the following:
 
@@ -69,6 +104,15 @@ EMAIL_WEBHOOK_PORT=3000
 # Subject tag that triggers RAG processing
 # Emails without this tag are acknowledged but not processed
 EMAIL_SUBJECT_TAG=[prompt]
+
+# Gmail Push Notifications (optional - for real-time delivery)
+GOOGLE_PROJECT_ID=your-gcp-project-id
+GOOGLE_CLIENT_ID=xxxxxxxxxxxx-xxxxxxxxxxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxx
+GOOGLE_REFRESH_TOKEN=1//04xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GOOGLE_PUBSUB_TOPIC_NAME=projects/your-project-id/topics/gmail-push-topic
+GMAIL_PUSH_WEBHOOK_PORT=8080
+GMAIL_PUSH_WEBHOOK_URL=https://your-domain.com/gmail-push
 ```
 
 ### 2. Start the Server
@@ -79,37 +123,78 @@ Run your server to start both the MCP transport and email webhook:
 npm start
 ```
 
-You should see output like:
+You should see output like this if Gmail Push is configured:
 
 ```
+[IMAP Service] Starting Gmail Push Notifications...
+[Gmail Push] ✓ Gmail watch active - History ID: 123456789
+[Gmail Push] ✓ Webhook server listening on port 8080
 [Email Webhook] Server started on port 3000
 [Email Webhook] Webhook URL: http://localhost:3000/webhook/email
-[Email Webhook] Health check: http://localhost:3000/health
-[Email Webhook] Status: http://localhost:3000/status
-[Email Webhook] Filtering emails with subject tag: [prompt]
 [RAG Server] Starting MCP server...
 [RAG Server] ✓ MCP server connected and ready
 ```
 
-### 3. Verify the Webhook is Running
+Or if using IMAP polling (fallback):
 
-Test your webhook endpoints:
-
-```bash
-# Health check
-curl http://localhost:3000/health
-
-# Status endpoint
-curl http://localhost:3000/status
+```
+[IMAP Service] Using IMAP polling as fallback...
+[IMAP Service] ✓ Polling mode active - checking every 10 seconds
+[Email Webhook] Server started on port 3000
 ```
 
 ---
 
 ## Setting Up Email Providers
 
-### Option 1: Mailgun (Recommended)
+### Option 1: Gmail Push Notifications (Recommended ⭐)
 
-Mailgun is the easiest option for receiving emails and forwarding to webhooks.
+**Best for:** Real-time delivery, no third-party services, free tier available
+
+See the dedicated setup guides:
+- **[Complete Setup Guide](docs/GMAIL_PUSH_SETUP.md)** - Full walkthrough with screenshots
+- **[Quick Start Guide](docs/PUSH_QUICKSTART.md)** - Get started in 10 minutes
+
+**What you'll configure:**
+1. Google Cloud Project with Gmail API and Pub/Sub enabled
+2. OAuth 2.0 credentials for authentication
+3. Cloud Pub/Sub topic and subscription for push notifications
+4. Webhook endpoint to receive instant email notifications
+
+**Benefits over IMAP polling:**
+- **Instant delivery** (sub-second vs 10-second polling delay)
+- **No connection overhead** - Google pushes when emails arrive
+- **Battery efficient** - No constant IMAP connections
+- **Production-ready** - Official Google API with auto-renewal
+
+---
+
+### Option 2: Gmail IMAP Polling (Fallback)
+
+**Best for:** Simple setup, no Google Cloud account needed
+
+If you don't want to set up Google Cloud Push Notifications, the system automatically falls back to IMAP polling:
+
+1. Enable IMAP in your Gmail settings
+2. Generate an app-specific password from Google Account security
+3. Add credentials to `.env`:
+
+```env
+IMAP_USER=your-email@gmail.com
+IMAP_PASSWORD=your-app-password  # 16-character app password, not regular password
+IMAP_HOST=imap.gmail.com
+IMAP_PORT=993
+```
+
+The server will poll for new emails every 10 seconds and process them automatically.
+
+---
+
+### Option 3: Mailgun (Webhook Alternative)
+
+**Best for:** Custom domains, email sending + receiving in one place
+
+---
 
 #### Step 1: Sign Up and Verify Domain
 
@@ -134,80 +219,70 @@ Send an email to your Mailgun address with `[prompt]` in the subject line.
 
 ---
 
-### Option 2: SendGrid Inbound Parse
-
-SendGrid can parse incoming emails and POST them to your webhook.
-
-#### Step 1: Set Up Inbound Parse
-
-1. Log into [sendgrid.com](https://sendgrid.com/)
-2. Navigate to **Settings → Inbound Parse**
-3. Add a hostname (e.g., `mail.yourdomain.com`)
-4. Set the destination URL: `http://your-server-ip:3000/webhook/email`
-5. Select **"POST the raw, full MIME message"**
-
-#### Step 2: Configure DNS
-
-Point your MX records to SendGrid's inbound servers as instructed.
-
----
-
-### Option 3: AWS SES Receipt Rules
-
-Since you're already using AWS SES for sending, this integrates seamlessly.
-
-#### Step 1: Create S3 Bucket (Optional)
-
-Create an S3 bucket to store raw email data if needed:
-
-```bash
-aws s3 mb s3://your-email-bucket-name --region us-east-2
-```
-
-#### Step 2: Create SNS Topic
-
-1. Go to **SNS → Topics** in AWS Console
-2. Create a new topic (e.g., `email-webhook-topic`)
-3. Add an HTTP/S subscription with your webhook URL
-
-#### Step 3: Configure Receipt Rule Set
-
-1. Navigate to **SES → Email Receiving → Receipt Rule Sets**
-2. Create a new rule set and activate it
-3. Add a recipient domain (e.g., `yourdomain.com`)
-4. Add condition: **Header → Subject contains "[prompt]"**
-5. Add action: **SNS** → Select your topic
-
-#### Step 4: Verify HTTPS Certificate
-
-AWS SES requires valid SSL certificates for HTTPS endpoints. Use AWS ACM to create and validate a certificate for your domain, or use HTTP (not recommended for production).
-
----
-
 ### Option 4: Local Development with ngrok
 
-For testing locally without exposing your server:
+For testing Gmail Push or webhooks locally without exposing your server:
 
 ```bash
 # Install ngrok if not already installed
 npm install -g ngrok
 
-# Start your RAG server
+# Start your RAG server (uses port 8080 for Gmail Push webhook)
 npm start
 
-# In a new terminal, create the tunnel
-ngrok http 3000
+# In a new terminal, create the tunnel to the webhook port
+ngrok http 8080
 ```
 
-Copy the HTTPS URL from ngrok (e.g., `https://abc123.ngrok.io`) and use it as your webhook URL in your email provider's settings.
+Copy the HTTPS URL from ngrok (e.g., `https://abc123.ngrok.io`) and update your `.env`:
+
+```env
+GMAIL_PUSH_WEBHOOK_URL=https://abc123.ngrok.io/gmail-push
+```
+
+Then update the Pub/Sub subscription with this URL:
+
+```bash
+gcloud pubsub subscriptions update gmail-push-subscription \
+    --push-endpoint=https://abc123.ngrok.io/gmail-push \
+    --project=your-project-id
+```
 
 ---
 
-## Testing
+## Testing Your Setup
+
+### Test Gmail Push Notifications
+
+1. **Send a test email** to your Gmail address with `[prompt]` in the subject:
+
+   **Subject:** `[prompt] Test push notification`  
+   **Body:** `This should trigger instant processing!`
+
+2. **Watch the logs** - within 1-2 seconds you should see:
+
+```
+[Gmail Push] Received notification from Google
+[Gmail Push] New email notification - History ID: 123456790
+[IMAP Service] Processing email through RAG pipeline...
+[IMAP Service] Found X relevant document chunks
+```
+
+### Test IMAP Polling (Fallback)
+
+1. Send a test email with `[prompt]` in the subject
+2. Wait up to 10 seconds for the next poll cycle
+3. Check logs for processing output
 
 ### Manual Webhook Test
 
 Test your endpoint directly with curl:
+
+---
+
+---
+
+## Troubleshooting
 
 ```bash
 curl -X POST http://localhost:3000/webhook/email \
@@ -405,22 +480,48 @@ Always validate and sanitize incoming data before processing.
 
 ---
 
+---
+
+## Comparison: Which Method Should You Use?
+
+| Feature | Gmail Push ⭐ | IMAP Polling | Webhook Services |
+|---------|---------------|--------------|------------------|
+| **Latency** | Instant (<1s) | 10 seconds | Instant |
+| **Setup Complexity** | Medium (10 min) | Easy (5 min) | Medium |
+| **Third-Party Required** | No (Google only) | No | Yes |
+| **Cost** | Free tier available | Free | Paid plans |
+| **Reliability** | Very High | High | High |
+| **Best For** | Production use | Quick testing | Custom domains |
+
+---
+
 ## Next Steps
 
 Once email receiving is configured:
 
 1. **Monitor logs** for successful email processing
-2. **Adjust search parameters** in `.env` to tune RAG results
-3. **Add response emails** using the existing `EmailService` to send back results
-4. **Set up logging** to a file or monitoring service for production use
+2. **Adjust search parameters** in `.env` to tune RAG results  
+3. **Add auto-response emails** using `EmailService.sendEmail()` to send RAG results back to sender
+4. **Set up production deployment** with PM2 or systemd for reliability
+5. **Configure Gmail filters** to auto-label `[prompt]` emails for better organization
 
 ---
 
-## Support
+## Support & Resources
 
-For issues or questions:
+### Documentation
+- **[Gmail Push Setup Guide](docs/GMAIL_PUSH_SETUP.md)** - Complete setup walkthrough
+- **[Quick Start Guide](docs/PUSH_QUICKSTART.md)** - Get started in 10 minutes  
+- **[IMAP Setup Guide](docs/GMAIL_IMAP_SETUP.md)** - Alternative IMAP configuration
 
-1. Check server logs: Look for `[Email Webhook]` prefixed messages
-2. Review email provider delivery logs
-3. Test with curl before sending real emails
-4. Verify all environment variables are correctly set
+### For Issues or Questions:
+
+1. Check server logs for `[Gmail Push]` or `[IMAP Service]` prefixed messages
+2. Review Google Cloud Pub/Sub message logs
+3. Test with a simple email before complex prompts
+4. Verify all environment variables are correctly set in `.env`
+
+### Official Resources:
+- [Gmail Push API Documentation](https://developers.google.com/gmail/api/guides/push)
+- [Cloud Pub/Sub Overview](https://cloud.google.com/pubsub/docs/overview)
+- [Google OAuth 2.0 Guide](https://developers.google.com/identity/protocols/oauth2)

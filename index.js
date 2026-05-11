@@ -1,4 +1,5 @@
 const { Server } = require("@modelcontextprotocol/sdk/server/index.js");
+const fsExtra = require("fs-extra");
 const {
     StdioServerTransport,
 } = require("@modelcontextprotocol/sdk/server/stdio.js");
@@ -16,7 +17,6 @@ const express = require("express");
 const EmbeddingEngine = require("./embeddingEngine");
 const MySQLVectorDatabase = require("./mysqlVectorDatabase");
 const EmailService = require("./emailService");
-const express = require("express");
 
 /**
  * Configuration for the RAG Endpoint
@@ -264,6 +264,83 @@ function setupEmailWebhookServer(embeddingEngine, vectorDb) {
         });
     });
 
+    /**
+     * Config endpoint - GET current configuration from .env file
+     */
+    app.get("/api/config", async (req, res) => {
+        try {
+            const envPath = path.join(__dirname, ".env");
+
+            // Check if .env file exists
+            if (!(await fsExtra.pathExists(envPath))) {
+                return res.status(404).json({
+                    success: false,
+                    message: ".env file not found",
+                    config: {},
+                });
+            }
+
+            // Read and parse .env file
+            const envContent = await fsExtra.readFile(envPath, "utf-8");
+            const parsedEnv = require("dotenv").parse(envContent);
+
+            res.status(200).json({
+                success: true,
+                config: parsedEnv,
+                raw: envContent,
+            });
+        } catch (error) {
+            console.error("[Config API] Error reading .env:", error.message);
+            res.status(500).json({
+                success: false,
+                message: "Error reading configuration",
+                error: error.message,
+            });
+        }
+    });
+
+    /**
+     * Config endpoint - POST to update .env file
+     */
+    app.post("/api/config", async (req, res) => {
+        try {
+            const envPath = path.join(__dirname, ".env");
+            const newConfig = req.body.config || {};
+
+            // Convert config object to .env format
+            let envContent = "";
+            for (const [key, value] of Object.entries(newConfig)) {
+                if (value !== undefined && value !== null) {
+                    // Escape quotes in values
+                    const stringValue = String(value);
+                    const escapedValue =
+                        stringValue.includes('"') || stringValue.includes("'")
+                            ? `"${stringValue.replace(/"/g, '\\"')}"`
+                            : stringValue;
+                    envContent += `${key}=${escapedValue}\n`;
+                }
+            }
+
+            // Write to .env file
+            await fsExtra.writeFile(envPath, envContent.trim(), "utf-8");
+
+            console.log("[Config API] Configuration updated successfully");
+
+            res.status(200).json({
+                success: true,
+                message: "Configuration saved",
+                config: newConfig,
+            });
+        } catch (error) {
+            console.error("[Config API] Error writing .env:", error.message);
+            res.status(500).json({
+                success: false,
+                message: "Error saving configuration",
+                error: error.message,
+            });
+        }
+    });
+
     // Start the HTTP server
     const httpServer = app.listen(CONFIG.EMAIL_WEBHOOK_PORT, () => {
         console.log(
@@ -281,6 +358,14 @@ function setupEmailWebhookServer(embeddingEngine, vectorDb) {
         console.log(
             `[Email Webhook] Filtering emails with subject tag: ${CONFIG.EMAIL_SUBJECT_TAG}`,
         );
+    });
+
+    /**
+     * Dashboard endpoint - serve the HTML dashboard
+     */
+    app.get("/", (req, res) => {
+        const dashboardPath = path.join(__dirname, "index.html");
+        res.sendFile(dashboardPath);
     });
 
     return httpServer;
@@ -1055,6 +1140,41 @@ async function main() {
         }
     }
 
+    // Start Gmail Push Notifications if configured (alternative to IMAP)
+    const gmailPushConfigured = !!(
+        process.env.GOOGLE_CLIENT_ID &&
+        process.env.GOOGLE_CLIENT_SECRET &&
+        process.env.GOOGLE_REFRESH_TOKEN &&
+        process.env.GOOGLE_PUBSUB_TOPIC_NAME
+    );
+
+    if (gmailPushConfigured) {
+        try {
+            const { setupGmailPush, startPushWebhook } = EmailService;
+
+            // Start the webhook server to receive Pub/Sub notifications
+            startPushWebhook();
+
+            // Setup Gmail watch after a short delay to ensure webhook is ready
+            setTimeout(async () => {
+                await setupGmailPush().catch((err) =>
+                    console.error(
+                        "[RAG Server] Failed to setup Gmail Push:",
+                        err.message,
+                    ),
+                );
+            }, 1000);
+
+            console.log("[RAG Server] ✓ Gmail Push notifications enabled");
+        } catch (error) {
+            console.error(
+                "[RAG Server] Failed to initialize Gmail Push:",
+                error.message,
+            );
+            console.log("[RAG Server] Continuing without Gmail Push");
+        }
+    }
+
     // Start MCP Server (stdio transport)
     console.log("[RAG Server] Starting MCP server...");
     const transport = new StdioServerTransport();
@@ -1062,18 +1182,20 @@ async function main() {
     console.log("[RAG Server] ✓ MCP server connected and ready");
 }
 
-// Handle graceful shutdown for IMAP connections
+// Handle graceful shutdown for IMAP and Gmail Push connections
 process.on("SIGINT", () => {
     console.log("\n[RAG Server] Shutting down...");
-    const { stopIMAPConnection } = EmailService;
+    const { stopIMAPConnection, stopGmailPush } = EmailService;
     stopIMAPConnection();
+    stopGmailPush();
     process.exit(0);
 });
 
 process.on("SIGTERM", () => {
     console.log("\n[RAG Server] Shutting down...");
-    const { stopIMAPConnection } = EmailService;
+    const { stopIMAPConnection, stopGmailPush } = EmailService;
     stopIMAPConnection();
+    stopGmailPush();
     process.exit(0);
 });
 

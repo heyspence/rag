@@ -9,7 +9,7 @@ This project provides a Model Context Protocol (MCP) server that implements Retr
 - **Persistent Storage**: Saves document embeddings to a local JSON file (`vector_store.json`) so you don't have to re-index everything on every restart.
 - **MCP Integration**: Provides standardized tools that allow LLMs to query your documents directly.
 - **OpenAI-Compatible Embeddings**: Works with LM Studio's developer endpoints or any OpenAI-compatible embedding API.
-- **Incoming Email Processing**: Receive emails via webhook, filter by subject tag (e.g., `[prompt]`), and process content through the RAG pipeline automatically.
+- **Incoming Email Processing**: Receive emails via Gmail Push Notifications (real-time) or IMAP polling, filter by subject tag (e.g., `[prompt]`), and process content through the RAG pipeline automatically. No third-party services required!
 
 ## Prerequisites
 
@@ -124,11 +124,26 @@ To use this RAG endpoint within LM Studio, you need to add it as an MCP server. 
 ```
 *(Note: Ensure the path in `args` points to the absolute path of your `index.js` file).*
 
-## Incoming Email Processing
+# Email Receiving Feature 📧
 
-The server can receive and process incoming emails via HTTP webhook. Emails with a specific subject tag (default: `[prompt]`) are automatically processed through the RAG pipeline.
+**Receive emails instantly and process them through your RAG pipeline!**
 
-### Configuration
+The server can receive and process incoming emails via two methods:
+
+1. **Gmail Push Notifications (Recommended ⭐)** - Real-time delivery with sub-second latency, no polling required
+2. **IMAP Polling (Fallback)** - Simple setup with 10-second polling intervals
+
+Both methods work without third-party webhook services! Emails with a specific subject tag (default: `[prompt]`) are automatically processed through the RAG pipeline.
+
+## Quick Start
+
+For complete setup instructions and testing guides, see:
+- **[README_EMAIL.md](README_EMAIL.md)** - Complete email receiving overview
+- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Interactive testing guide  
+- **[docs/GMAIL_PUSH_SETUP.md](docs/GMAIL_PUSH_SETUP.md)** - Gmail Push setup walkthrough (10 minutes)
+- **[docs/GMAIL_IMAP_SETUP.md](docs/GMAIL_IMAP_SETUP.md)** - IMAP polling configuration
+
+## Configuration
 
 Add these environment variables to your `.env` file:
 
@@ -138,11 +153,28 @@ EMAIL_WEBHOOK_PORT=3000
 
 # Subject tag that triggers processing (emails without this tag are ignored)
 EMAIL_SUBJECT_TAG=[prompt]
+
+# Gmail Push Notifications (optional - for real-time delivery)
+GOOGLE_PROJECT_ID=your-gcp-project-id
+GOOGLE_CLIENT_ID=xxxxxxxxxxxx-xxxxxxxxxxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxx
+GOOGLE_REFRESH_TOKEN=1//04xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GOOGLE_PUBSUB_TOPIC_NAME=projects/your-project-id/topics/gmail-push-topic
+GMAIL_PUSH_WEBHOOK_PORT=8080
+GMAIL_PUSH_WEBHOOK_URL=https://your-domain.com/gmail-push
+
+# IMAP Polling (fallback method)
+IMAP_USER=your-email@gmail.com
+IMAP_PASSWORD=xxxx xxxx xxxx xxxx  # 16-character app password
+IMAP_HOST=imap.gmail.com
+IMAP_PORT=993
 ```
 
-### Webhook Endpoints
+## Webhook Endpoints
 
 Once started, the server exposes these endpoints:
+
+### HTTP Webhook (for IMAP or alternative email providers)
 
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
@@ -150,11 +182,63 @@ Once started, the server exposes these endpoints:
 | `/health` | GET | Health check endpoint |
 | `/status` | GET | Show webhook configuration status |
 
-### Setting Up Email Forwarding
+### Gmail Push Webhook (for real-time notifications)
 
-You have several options to forward emails to your webhook:
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/gmail-push` | POST | Receive Google Cloud Pub/Sub push notifications |
+| `/oauth2callback` | GET | OAuth 2.0 callback for authentication |
+| `/health` | GET | Health check (on port 8080) |
 
-#### Option 1: Mailgun (Recommended)
+## Setting Up Email Receiving
+
+Choose one of the following methods based on your needs:
+
+### Method 1: Gmail Push Notifications (Recommended ⭐)
+
+**Best for:** Production use, real-time delivery (<2 seconds), no third-party services
+
+**Setup time:** ~10 minutes
+
+See the complete guide: **[docs/GMAIL_PUSH_SETUP.md](docs/GMAIL_PUSH_SETUP.md)**
+
+**What you'll configure:**
+1. Google Cloud Project with Gmail API and Pub/Sub enabled
+2. OAuth 2.0 credentials for authentication  
+3. Cloud Pub/Sub topic and subscription for push notifications
+4. Webhook endpoint to receive instant email notifications
+
+**Benefits:**
+- ✅ Instant delivery (sub-second latency)
+- ✅ No polling overhead - saves resources
+- ✅ Official Google API - production-ready
+- ✅ Works through firewalls using HTTPS webhooks
+- ✅ Free tier available - no third-party service required
+
+### Method 2: IMAP Polling (Fallback)
+
+**Best for:** Quick testing, simple setup, no Google Cloud account needed
+
+**Setup time:** ~5 minutes
+
+See the complete guide: **[docs/GMAIL_IMAP_SETUP.md](docs/GMAIL_IMAP_SETUP.md)**
+
+**What you'll configure:**
+1. Enable IMAP in Gmail settings
+2. Generate app-specific password from Google Account security
+3. Add credentials to `.env` file
+
+**Benefits:**
+- ✅ Simple setup - no OAuth or Google Cloud required
+- ✅ Works with any IMAP-compatible email provider
+- ✅ Free and no third-party services
+- ⚠️ 10-second polling delay (not instant)
+
+### Method 3: Webhook Services (Alternative)
+
+You have several options to forward emails via HTTP webhook:
+
+#### Option A: Mailgun
 
 1. Sign up for [Mailgun](https://www.mailgun.com/) and verify your domain
 2. Create a route in Mailgun Dashboard:
@@ -162,7 +246,7 @@ You have several options to forward emails to your webhook:
    - **Action**: `forward("http://your-server-ip:3000/webhook/email")`
 3. Update DNS records as instructed by Mailgun
 
-#### Option 2: SendGrid
+#### Option B: SendGrid
 
 1. Create a [SendGrid account](https://sendgrid.com/)
 2. Navigate to Settings → Inbound Parse
@@ -189,9 +273,24 @@ Use Gmail filters or Outlook rules to forward matching emails:
 2. Set action to "Forward to" your webhook URL
 3. Note: This requires a forwarding service since email clients can't POST to HTTP endpoints directly
 
-### Testing the Webhook
+## Testing Your Setup
 
-Test manually with curl:
+Before going live, run the interactive test script:
+
+```bash
+cd rag_endpoint
+./scripts/test-email-receiving.sh
+```
+
+This will guide you through:
+- Verifying configuration files
+- Checking dependencies and server status  
+- Sending test emails
+- Monitoring processing logs
+
+### Manual Webhook Test
+
+Test manually with curl (for IMAP or webhook services):
 
 ```bash
 curl -X POST http://localhost:3000/webhook/email \
@@ -217,11 +316,25 @@ Expected response:
 }
 ```
 
-### Important Notes
+## Important Notes
 
+### For Gmail Push Notifications:
+- Watch expires after ~7 days but auto-renews 24 hours before expiration
+- Requires HTTPS webhook URL in production (ngrok works for local testing)
+- OAuth refresh token must be stored securely (in `.env`, never commit to Git)
+- Server must remain running to maintain the watch
+
+### For IMAP Polling:
+- Uses app-specific password, not regular Gmail password
+- Port 993 (IMAP over SSL) must be accessible
+- Polls every 10 seconds for new emails
+- Works through most residential ISPs (unlike port 25 SMTP)
+
+### General:
 - The webhook server runs on a separate HTTP port (default 3000) from the MCP stdio transport
+- Gmail Push webhook uses port 8080 by default
 - Your server must be publicly accessible for external email services to reach it
-- Use ngrok or similar tools for local development: `ngrok http 3000`
+- Use ngrok or similar tools for local development: `ngrok http 8080` (for Gmail Push) or `ngrok http 3000` (for webhooks)
 - Emails without the subject tag are acknowledged but not processed
 - Both plain text and HTML email bodies are supported
 
@@ -244,22 +357,31 @@ To run the server in development mode with auto-restart:
 npm run dev
 ```
 
-### Running with Email Webhook
+### Running with Email Receiving
 
-Start the server to enable both MCP tools and email webhook:
+Start the server to enable both MCP tools and email receiving:
 
 ```bash
 npm start
 ```
 
-You should see output like:
+#### Expected Output - Gmail Push Notifications:
 
 ```
-[Email Webhook] Server started on port 3000
-[Email Webhook] Webhook URL: http://localhost:3000/webhook/email
-[Email Webhook] Health check: http://localhost:3000/health
-[Email Webhook] Status: http://localhost:3000/status
-[Email Webhook] Filtering emails with subject tag: [prompt]
+[IMAP Service] Starting Gmail Push Notifications...
+[Gmail Push] ✓ Gmail watch active - History ID: 123456789
+[Gmail Push] ✓ Webhook server listening on port 8080
+[RAG Server] Starting MCP server...
+[RAG Server] ✓ MCP server connected and ready
+```
+
+#### Expected Output - IMAP Polling (Fallback):
+
+```
+[IMAP Service] Using IMAP polling as fallback...
+[IMAP Service] ✓ Connected to IMAP server
+[IMAP Service] ✓ Opened INBOX (X total messages)
+[IMAP Service] ✓ IDLE mode active - waiting for new emails
 [RAG Server] Starting MCP server...
 [RAG Server] ✓ MCP server connected and ready
 ```
@@ -274,4 +396,38 @@ Check which storage backend is being used by examining the startup logs:
 or
 ```
 [RAG Server] MySQL not configured, falling back to JSON-based vector storage...
+```
+
+## Additional Resources
+
+### Documentation Files
+
+- **[README_EMAIL.md](README_EMAIL.md)** - Complete email receiving feature overview with architecture diagrams
+- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Comprehensive testing guide with sign-off template
+- **[EMAIL_RECEIVING.md](EMAIL_RECEIVING.md)** - Detailed setup instructions for all methods
+- **[docs/GMAIL_PUSH_SETUP.md](docs/GMAIL_PUSH_SETUP.md)** - Gmail Push Notifications walkthrough (recommended)
+- **[docs/PUSH_QUICKSTART.md](docs/PUSH_QUICKSTART.md)** - Get started in 10 minutes
+- **[docs/GMAIL_IMAP_SETUP.md](docs/GMAIL_IMAP_SETUP.md)** - IMAP polling configuration guide
+
+### Testing Scripts
+
+- **`./scripts/test-email-receiving.sh`** - Interactive test suite (run after setup)
+
+### Production Deployment
+
+For production deployment with process management:
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start server with auto-restart
+pm2 start index.js --name rag-endpoint
+
+# Enable auto-start on system boot
+pm2 startup
+pm2 save
+
+# Monitor logs
+pm2 logs rag-endpoint
 ```

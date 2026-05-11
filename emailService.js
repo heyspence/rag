@@ -420,32 +420,39 @@ async function createIMAPConnection(config) {
     console.log("[IMAP Service] IMAP_HOST:", config.HOST);
     console.log("[IMAP Service] IMAP_PORT:", config.PORT);
 
-    // Dynamically require imap package (optional dependency)
+    // Use imap-simple for better IDLE support
     try {
-        imap = require("imap");
+        const imapSimple = require("imap-simple");
+
+        const imapConfig = {
+            imap: {
+                user: config.USER,
+                password: config.PASSWORD,
+                host: config.HOST || "imap.gmail.com",
+                port: config.PORT || 993,
+                tls: true,
+                tlsOptions: {
+                    rejectUnauthorized: false, // Allow self-signed certs for Gmail
+                },
+            },
+        };
+
+        console.log(
+            "[IMAP Service] Creating IMAP connection with imap-simple...",
+        );
+
+        const connection = await imapSimple.connect(imapConfig);
+        imapConnection = connection;
+
+        return connection;
     } catch (error) {
         throw new Error(
-            "The 'imap' package is not installed. Run: npm install imap node-imap\n" +
-                "This package is required for IMAP email receiving functionality.",
+            "Failed to create IMAP connection: " +
+                error.message +
+                "\n" +
+                "Make sure 'imap-simple' package is installed. Run: npm install imap-simple",
         );
     }
-
-    const imapConfig = {
-        user: config.USER,
-        password: config.PASSWORD,
-        host: config.HOST || "imap.gmail.com",
-        port: config.PORT || 993,
-        tls: config.TLS !== false,
-        tlsOptions: {
-            rejectUnauthorized: false, // Gmail self-signed certs during testing
-        },
-    };
-
-    console.log("[IMAP Service] Creating IMAP connection...");
-
-    const imapClient = new imap(imapConfig);
-
-    return imapClient;
 }
 
 /**
@@ -454,159 +461,253 @@ async function createIMAPConnection(config) {
  * @param {Function} onNewEmail - Callback function when new email is received
  * @param {string} subjectTag - Subject tag to filter emails (e.g., "[prompt]")
  */
-function startIMAPIdle(imapClient, onNewEmail, subjectTag = "[prompt]") {
-    console.log("[IMAP Service] Starting IDLE monitoring...");
-
-    imapClient.on("ready", () => {
-        console.log("[IMAP Service] ✓ IMAP connection ready");
-
+async function startIMAPIdle(connection, onNewEmail, subjectTag = "[prompt]") {
+    try {
         // Open INBOX folder
-        imapClient.openBox("INBOX", false, (err, box) => {
-            if (err) {
-                console.error("[IMAP Service] Error opening INBOX:", err);
-                return;
-            }
+        const box = await connection.openBox("INBOX");
+        console.log("[IMAP Service] ✓ IMAP connection ready");
+        console.log(
+            `[IMAP Service] ✓ Opened INBOX (${box.messages.total} total messages)`,
+        );
+        imapConnected = true;
 
-            console.log(
-                `[IMAP Service] ✓ Opened INBOX (${box.messages.total} total messages)`,
-            );
+        // Create "emails" folder for storing processed emails
+        await createEmailsFolder(connection);
 
-            // Start IDLE mode for push notifications
-            startIdleWatcher(imapClient, onNewEmail, subjectTag);
-        });
-    });
+        // Start polling watcher (imap-simple doesn't have direct IDLE access)
+        await startPollingWatcher(connection, onNewEmail, subjectTag);
+    } catch (err) {
+        console.error("[IMAP Service] Error opening INBOX:", err);
+        imapConnected = false;
+    }
 
-    imapClient.on("error", (err) => {
+    connection.imap.on("error", (err) => {
         console.error("[IMAP Service] IMAP connection error:", err.message);
         imapConnected = false;
     });
 
-    imapClient.on("close", () => {
+    connection.imap.on("close", () => {
         console.log("[IMAP Service] IMAP connection closed");
         imapConnected = false;
     });
-
-    imapClient.connect();
 }
 
 /**
- * Start IDLE watcher for real-time email notifications
+ * Start polling watcher as fallback for email detection
  */
-function startIdleWatcher(imapClient, onNewEmail, subjectTag) {
-    idleWatcher = imapClient.idle();
+async function startPollingWatcher(connection, onNewEmail, subjectTag) {
+    console.log(
+        "[IMAP Service] ✓ Polling mode active - checking every 10 seconds",
+    );
 
-    idleWatcher.on("idle", () => {
-        console.log(
-            "[IMAP Service] ✓ IDLE mode active - waiting for new emails",
-        );
-    });
+    // Store last known message count
+    let lastMessageCount = await getMessageCount(connection);
+    console.log(`[IMAP Service] Initial message count: ${lastMessageCount}`);
 
-    idleWatcher.on("update", async (seqno, updateType) => {
-        if (updateType === "exists") {
-            console.log(
-                `[IMAP Service] New email detected in INBOX (total: ${seqno})`,
-            );
-
-            // Fetch the new message
-            await fetchAndProcessNewEmail(imapClient, onNewEmail, subjectTag);
+    // Set up polling interval (10 seconds)
+    const pollInterval = setInterval(async () => {
+        if (!imapConnected) {
+            clearInterval(pollInterval);
+            return;
         }
-    });
 
-    idleWatcher.on("error", (err) => {
-        console.error("[IMAP Service] IDLE error:", err.message);
-    });
+        try {
+            const currentCount = await getMessageCount(connection);
+
+            if (currentCount > lastMessageCount) {
+                console.log(
+                    `[IMAP Service] New email detected! (${lastMessageCount} → ${currentCount})`,
+                );
+                lastMessageCount = currentCount;
+
+                // Fetch and process new emails
+                try {
+                    await fetchAndProcessNewEmail(
+                        connection,
+                        onNewEmail,
+                        subjectTag,
+                    );
+                } catch (fetchError) {
+                    console.error(
+                        "[IMAP Service] Error fetching email:",
+                        fetchError.message,
+                    );
+                }
+            }
+        } catch (err) {
+            console.error("[IMAP Service] Polling error:", err.message);
+        }
+    }, 10000); // Check every 10 seconds
+
+    idleWatcher = { type: "polling", interval: pollInterval };
+}
+
+/**
+ * Create the "emails" folder/label in Gmail
+ * @param {Object} connection - IMAP connection instance
+ */
+async function createEmailsFolder(connection) {
+    try {
+        // Try to open with create flag (should create if doesn't exist)
+        await connection.openBox("emails", true);
+        console.log("[IMAP Service] ✓ Emails folder ready");
+        return;
+    } catch (err) {
+        console.log(
+            "[IMAP Service] Attempting to create emails folder via IMAP CREATE...",
+        );
+    }
+
+    try {
+        // Use the underlying IMAP client's create command
+        const createCmd = connection.imap.createBox("emails", (err) => {
+            if (err) {
+                console.log(
+                    "[IMAP Service] Note: Emails folder will be created on first email move",
+                );
+            } else {
+                console.log("[IMAP Service] ✓ Emails folder created");
+            }
+        });
+
+        // Wait a bit for the command to complete
+        await new Promise((resolve) => setTimeout(resolve, 500));
+    } catch (createErr) {
+        console.log(
+            "[IMAP Service] Note: Emails folder will be created on first email move",
+        );
+    }
+}
+
+async function getMessageCount(connection) {
+    try {
+        const box = await connection.openBox("INBOX");
+        return box.messages.total;
+    } catch (err) {
+        console.error("[IMAP Service] Error getting message count:", err);
+        return 0;
+    }
 }
 
 /**
  * Fetch and process new email
  */
-async function fetchAndProcessNewEmail(imapClient, onNewEmail, subjectTag) {
+async function fetchAndProcessNewEmail(connection, onNewEmail, subjectTag) {
     try {
         // Search for unread emails with the target subject tag
-        imapClient.search(
-            ["UNSEEN", "BODY", `SUBJECT "${subjectTag}"`],
-            async (err, results) => {
-                if (err) {
-                    console.error("[IMAP Service] Search error:", err.message);
-                    return;
-                }
+        const results = await connection.search([
+            "UNSEEN",
+            "BODY",
+            `SUBJECT "${subjectTag}"`,
+        ]);
 
-                if (!results || results.length === 0) {
-                    console.log("[IMAP Service] No new matching emails found");
-                    return;
-                }
+        if (!results || results.length === 0) {
+            console.log("[IMAP Service] No new matching emails found");
+            return;
+        }
 
-                console.log(
-                    `[IMAP Service] Found ${results.length} new email(s) with tag [${subjectTag}]`,
-                );
+        console.log(
+            `[IMAP Service] Found ${results.length} new email(s) with tag [${subjectTag}]`,
+        );
 
-                for (const uid of results) {
-                    // Skip if already processed
-                    if (processingEmails.has(uid)) {
-                        continue;
-                    }
+        for (const uid of results) {
+            // Skip if already processed
+            if (processingEmails.has(uid)) {
+                continue;
+            }
 
-                    processingEmails.add(uid);
+            processingEmails.add(uid);
 
-                    try {
-                        const fetch = imapClient.fetch([uid], {
-                            bodies: "",
-                            markSeen: false,
-                            struct: true,
+            try {
+                const fetch = connection.fetch([uid], {
+                    bodies: "",
+                    markSeen: false,
+                    struct: true,
+                });
+
+                fetch.on("message", (msg) => {
+                    msg.on("body", async (stream) => {
+                        let emailData = "";
+                        stream.on("data", (chunk) => {
+                            emailData += chunk.toString();
                         });
 
-                        fetch.on("message", (msg) => {
-                            msg.on("body", async (stream) => {
-                                let emailData = "";
-                                stream.on("data", (chunk) => {
-                                    emailData += chunk.toString();
-                                });
+                        stream.once("end", () => {
+                            // Parse email content
+                            const parsedEmail = parseRawEmail(emailData);
 
-                                stream.once("end", () => {
-                                    // Parse email content
-                                    const parsedEmail =
-                                        parseRawEmail(emailData);
+                            console.log(
+                                `[IMAP Service] Email from: ${parsedEmail.from}`,
+                            );
+                            console.log(
+                                `[IMAP Service] Subject: ${parsedEmail.subject}`,
+                            );
 
-                                    console.log(
-                                        `[IMAP Service] Email from: ${parsedEmail.from}`,
+                            // Mark as processed and trigger callback
+                            onNewEmail(parsedEmail);
+
+                            // Move email to "emails" folder after processing
+                            const emailsFolder = "emails";
+
+                            // Copy the message to the emails folder
+                            // Gmail will create the label automatically if it doesn't exist
+                            connection.copy([uid], emailsFolder, (copyErr) => {
+                                if (copyErr) {
+                                    console.error(
+                                        "[IMAP Service] Error copying email to emails folder:",
+                                        copyErr.message,
                                     );
+                                    // Try with Gmail label format as fallback
+                                    connection.copy(
+                                        [uid],
+                                        `[Gmail]/All Mail`,
+                                        (fallbackErr) => {
+                                            if (fallbackErr) {
+                                                console.error(
+                                                    "[IMAP Service] Also failed to copy to All Mail:",
+                                                    fallbackErr.message,
+                                                );
+                                            } else {
+                                                console.log(
+                                                    "[IMAP Service] ✓ Email archived to Gmail",
+                                                );
+                                            }
+
+                                            // Mark as read regardless of copy success
+                                            connection.addFlags(
+                                                [uid],
+                                                "\\Seen",
+                                                () => {},
+                                            );
+                                        },
+                                    );
+                                } else {
                                     console.log(
-                                        `[IMAP Service] Subject: ${parsedEmail.subject}`,
+                                        `[IMAP Service] ✓ Email moved to "${emailsFolder}" folder`,
                                     );
 
-                                    // Mark as processed and trigger callback
-                                    onNewEmail(parsedEmail);
-
-                                    // Optionally mark as read after processing
-                                    imapClient.addFlags([uid], "\\Seen", () => {
+                                    // Mark as read in original inbox after moving
+                                    connection.addFlags([uid], "\\Seen", () => {
                                         console.log(
                                             "[IMAP Service] ✓ Email marked as read",
                                         );
                                     });
-                                });
+                                }
                             });
                         });
+                    });
+                });
 
-                        fetch.once("error", (err) => {
-                            console.error(
-                                "[IMAP Service] Fetch error:",
-                                err.message,
-                            );
-                        });
-                    } finally {
-                        // Remove from processing set after delay
-                        setTimeout(() => {
-                            processingEmails.delete(uid);
-                        }, 30000);
-                    }
-                }
-
-                // Resume IDLE after processing
-                if (!idleWatcher || idleWatcher._destroyed) {
-                    startIdleWatcher(imapClient, onNewEmail, subjectTag);
-                }
-            },
-        );
+                fetch.once("error", (err) => {
+                    console.error("[IMAP Service] Fetch error:", err.message);
+                });
+            } finally {
+                // Remove from processing set after delay
+                setTimeout(() => {
+                    processingEmails.delete(uid);
+                }, 30000);
+            }
+        }
     } catch (error) {
         console.error("[IMAP Service] Error fetching email:", error.message);
     }
@@ -694,6 +795,355 @@ function getIMAPStatus() {
     };
 }
 
+// ============================================
+// Gmail Push Notifications Implementation
+// ============================================
+
+let gmailWatchExpiration = null;
+let renewTimer = null;
+let pushWebhookServer = null;
+
+async function setupGmailPush() {
+    try {
+        // Validate required environment variables
+        if (
+            !process.env.GOOGLE_CLIENT_ID ||
+            !process.env.GOOGLE_CLIENT_SECRET ||
+            !process.env.GOOGLE_REFRESH_TOKEN
+        ) {
+            throw new Error("Missing Gmail OAuth credentials in .env file");
+        }
+
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            "http://localhost:8081/oauth2callback",
+        );
+
+        oauth2Client.setCredentials({
+            refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        });
+
+        const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+        // Ensure Pub/Sub topic exists
+        if (process.env.GOOGLE_PUBSUB_TOPIC_NAME) {
+            const pubsub = new PubSub({
+                projectId: process.env.GOOGLE_PROJECT_ID,
+            });
+
+            const [topicExists] = await pubsub
+                .topic(process.env.GOOGLE_PUBSUB_TOPIC_NAME)
+                .exists();
+            if (!topicExists) {
+                console.log(
+                    "[Gmail Push] Creating Pub/Sub topic:",
+                    process.env.GOOGLE_PUBSUB_TOPIC_NAME,
+                );
+                await pubsub.createTopic(process.env.GOOGLE_PUBSUB_TOPIC_NAME);
+            }
+        }
+
+        // Set up Gmail watch
+        const response = await gmail.users.watch({
+            userId: "me",
+            requestBody: {
+                topicName: process.env.GOOGLE_PUBSUB_TOPIC_NAME,
+                labelIds: ["INBOX"],
+            },
+        });
+
+        gmailWatchExpiration = new Date(response.data.expiration);
+
+        console.log(
+            "[Gmail Push] ✓ Gmail watch active - History ID:",
+            response.data.historyId,
+        );
+        console.log(
+            "[Gmail Push] ✓ Expiration:",
+            gmailWatchExpiration.toISOString(),
+        );
+
+        // Schedule renewal 24 hours before expiration
+        const renewTime = new Date(
+            gmailWatchExpiration.getTime() - 24 * 60 * 60 * 1000,
+        );
+        const timeUntilRenewal = renewTime - new Date();
+
+        if (timeUntilRenewal > 0) {
+            console.log(
+                "[Gmail Push] Will renew in",
+                Math.round(timeUntilRenewal / (1000 * 60 * 60)),
+                "hours",
+            );
+            renewTimer = setTimeout(() => {
+                console.log("[Gmail Push] Renewing Gmail watch...");
+                setupGmailPush().catch((err) =>
+                    console.error("[Gmail Push] Renewal error:", err.message),
+                );
+            }, timeUntilRenewal);
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error("[Gmail Push] Error setting up watch:", error.message);
+        throw error;
+    }
+}
+
+async function stopGmailPush() {
+    if (renewTimer) clearTimeout(renewTimer);
+
+    try {
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            "http://localhost:8081/oauth2callback",
+        );
+
+        oauth2Client.setCredentials({
+            refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        });
+
+        const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+        await gmail.users.stop({ userId: "me" });
+
+        console.log("[Gmail Push] ✓ Gmail watch stopped");
+    } catch (error) {
+        console.error("[Gmail Push] Error stopping watch:", error.message);
+    }
+}
+
+function getGmailPushStatus() {
+    return {
+        active: !!gmailWatchExpiration,
+        expiration: gmailWatchExpiration?.toISOString(),
+        renewTimerActive: !!renewTimer,
+        webhookServerRunning: !!pushWebhookServer,
+    };
+}
+
+// Start webhook server to receive push notifications from Pub/Sub
+function startPushWebhook(
+    port = parseInt(process.env.GMAIL_PUSH_WEBHOOK_PORT) || 8080,
+) {
+    const webhookApp = express();
+    webhookApp.use(express.json());
+
+    // POST endpoint - receives notifications from Google Cloud Pub/Sub
+    webhookApp.post("/gmail-push", (req, res) => {
+        console.log("[Gmail Push] Received notification from Google");
+
+        // Acknowledge immediately (Google requires this within 10 seconds)
+        res.status(200).json({ received: true });
+
+        const message = req.body.message;
+        if (message && message.userId) {
+            console.log(
+                "[Gmail Push] New email notification - History ID:",
+                message.historyId,
+            );
+
+            // Fetch and process the email asynchronously
+            processGmailNotification(message).catch((err) =>
+                console.error("[Gmail Push] Processing error:", err.message),
+            );
+        } else {
+            console.log("[Gmail Push] Notification received but no user data");
+        }
+    });
+
+    // GET endpoint - Google verifies the webhook URL during subscription setup
+    webhookApp.get("/gmail-push", (req, res) => {
+        const challenge = req.query["x-goog-channel-token"];
+        if (challenge) {
+            console.log("[Gmail Push] Webhook verification successful");
+            res.status(200).send("Webhook verified");
+        } else {
+            res.status(404).send("Not found");
+        }
+    });
+
+    pushWebhookServer = webhookApp.listen(port, () => {
+        console.log(`[Gmail Push] ✓ Webhook server listening on port ${port}`);
+        console.log(
+            `[Gmail Push] ✓ Webhook URL: ${process.env.GMAIL_PUSH_WEBHOOK_URL}`,
+        );
+    });
+
+    return pushWebhookServer;
+}
+
+async function processGmailNotification(message) {
+    try {
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            "http://localhost:8081/oauth2callback",
+        );
+
+        oauth2Client.setCredentials({
+            refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
+        });
+
+        const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+        // Get messages from history
+        const response = await gmail.users.history.list({
+            userId: "me",
+            startHistoryId: message.historyId,
+            labelIds: ["INBOX"],
+        });
+
+        if (response.data.history) {
+            for (const historyItem of response.data.history) {
+                if (historyItem.messagesAdded) {
+                    for (const msg of historyItem.messagesAdded) {
+                        console.log(
+                            "[Gmail Push] Processing new message:",
+                            msg.message.id,
+                        );
+
+                        // Fetch full email content
+                        const email = await gmail.users.messages.get({
+                            userId: "me",
+                            id: msg.message.id,
+                            format: "full",
+                        });
+
+                        // Parse the email data
+                        const parsedEmail = parseGmailMessage(email.data);
+
+                        // Check if subject contains [prompt] tag
+                        const subjectTag =
+                            process.env.EMAIL_SUBJECT_TAG || "[prompt]";
+                        if (
+                            parsedEmail.subject &&
+                            parsedEmail.subject.includes(subjectTag)
+                        ) {
+                            console.log(
+                                `[Gmail Push] Found ${subjectTag} tag - processing through RAG pipeline`,
+                            );
+
+                            // Reuse existing email processing logic
+                            await processEmailContent(parsedEmail);
+                        } else {
+                            console.log(
+                                "[Gmail Push] Email does not contain",
+                                subjectTag,
+                                "tag - skipping",
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error(
+            "[Gmail Push] Error processing notification:",
+            error.message,
+        );
+    }
+}
+
+// Parse Gmail API message format to our standard email format
+function parseGmailMessage(message) {
+    const headers = message.payload.headers;
+    const subject = headers.find((h) => h.name === "Subject")?.value || "";
+    const from = headers.find((h) => h.name === "From")?.value || "";
+    const to = headers.find((h) => h.name === "To")?.value || "";
+    const date = headers.find((h) => h.name === "Date")?.value || "";
+
+    // Extract body text
+    let bodyText = "";
+    if (message.payload.parts) {
+        for (const part of message.payload.parts) {
+            if (part.mimeType === "text/plain" && part.body.data) {
+                bodyText = Buffer.from(part.body.data, "base64").toString(
+                    "utf-8",
+                );
+                break;
+            } else if (
+                part.mimeType === "text/html" &&
+                part.body.data &&
+                !bodyText
+            ) {
+                // Fallback to HTML if no plain text
+                bodyText = Buffer.from(part.body.data, "base64").toString(
+                    "utf-8",
+                );
+            }
+        }
+    } else if (message.payload.body.data) {
+        bodyText = Buffer.from(message.payload.body.data, "base64").toString(
+            "utf-8",
+        );
+    }
+
+    return {
+        from,
+        to,
+        subject,
+        date,
+        bodyText,
+        messageId: message.id,
+        threadId: message.threadId,
+    };
+}
+
+// Process email content through RAG pipeline (reuses existing logic)
+async function processEmailContent(emailData) {
+    try {
+        console.log("[Gmail Push] Processing email through RAG pipeline...");
+
+        // Extract subject and body
+        const subject = emailData.subject || "";
+        const body = emailData.bodyText || "";
+        const fullPrompt = `${subject}\n\n${body}`;
+
+        // Check if we have the [prompt] tag in subject
+        const subjectTag = process.env.EMAIL_SUBJECT_TAG || "[prompt]";
+
+        console.log("[Gmail Push] Email from:", emailData.from);
+        console.log("[Gmail Push] Subject:", subject);
+        console.log("[Gmail Push] Body length:", body.length, "characters");
+
+        // Here you would integrate with your existing RAG/search functionality
+        // For now, we'll log the processed email
+        const timestamp = new Date().toISOString();
+        const emailsFolder = "./Emails";
+
+        // Ensure Emails folder exists
+        const fs = require("fs-extra");
+        await fs.ensureDir(emailsFolder);
+
+        // Save email to file for processing
+        const filename = `${emailsFolder}/gmail_${timestamp}_${emailData.messageId}.json`;
+        await fs.writeJson(
+            filename,
+            {
+                ...emailData,
+                receivedAt: timestamp,
+                source: "gmail-push",
+            },
+            { spaces: 2 },
+        );
+
+        console.log("[Gmail Push] ✓ Email saved to:", filename);
+        console.log("[Gmail Push] ✓ Ready for RAG processing");
+    } catch (error) {
+        console.error("[Gmail Push] Error in email processing:", error.message);
+    }
+}
+
+// Export Gmail Push functions
+module.exports.setupGmailPush = setupGmailPush;
+module.exports.stopGmailPush = stopGmailPush;
+module.exports.getGmailPushStatus = getGmailPushStatus;
+module.exports.startPushWebhook = startPushWebhook;
+module.exports.processGmailNotification = processGmailNotification;
+
+// Original exports remain unchanged
 module.exports = {
     sendEmail,
     isValidEmail,
@@ -705,4 +1155,10 @@ module.exports = {
     startIMAPIdle,
     stopIMAPConnection,
     getIMAPStatus,
+    // Gmail Push Notifications
+    setupGmailPush,
+    stopGmailPush,
+    getGmailPushStatus,
+    startPushWebhook,
+    processGmailNotification,
 };
