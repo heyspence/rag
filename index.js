@@ -42,7 +42,17 @@ const CONFIG = {
         parseInt(process.env.RAG_INDEXING_CONCURRENCY, 10) || 5,
     SEARCH_TOP_K: parseInt(process.env.RAG_SEARCH_TOP_K, 10) || 10,
     SEARCH_MIN_SCORE: parseFloat(process.env.RAG_SEARCH_MIN_SCORE) || 0.5,
+    ENABLE_DIAGNOSTIC_LOGGING: process.env.RAG_ENABLE_DIAGNOSTICS === "true",
 };
+
+/**
+ * Diagnostic logging helper - only logs when diagnostics are enabled
+ */
+function diagLog(...args) {
+    if (CONFIG.ENABLE_DIAGNOSTIC_LOGGING) {
+        console.error("[DIAG]", ...args);
+    }
+}
 
 /**
  * Utility to split text into overlapping chunks for better retrieval context
@@ -71,13 +81,30 @@ async function main() {
 
     await vectorDb.load();
 
+    // DIAGNOSTIC: Log startup environment info
+    diagLog("=== RAG SERVER STARTUP DIAGNOSTICS ===");
+    diagLog("DOCUMENTS_FOLDER:", CONFIG.DOCUMENTS_FOLDER);
+    diagLog("DOCUMENTS_FOLDER_EXISTS:", fs.existsSync(CONFIG.DOCUMENTS_FOLDER));
+    diagLog("VECTOR_STORE_PATH:", CONFIG.VECTOR_STORE_PATH);
+    diagLog("SUPPORTED_EXTENSIONS:", CONFIG.SUPPORTED_EXTENSIONS.join(", "));
+    diagLog("ENABLE_DIAGNOSTIC_LOGGING:", CONFIG.ENABLE_DIAGNOSTIC_LOGGING);
+
     /**
      * Logic to index a single file
      */
     async function indexFile(filePath, isBulkIndex = false) {
         try {
             const extension = path.extname(filePath).toLowerCase();
-            if (!CONFIG.SUPPORTED_EXTENSIONS.includes(extension)) return;
+            if (!CONFIG.SUPPORTED_EXTENSIONS.includes(extension)) {
+                diagLog(
+                    "SKIPPING (unsupported extension):",
+                    filePath,
+                    "extension:",
+                    extension,
+                );
+                return;
+            }
+            diagLog("INDEXING FILE:", filePath, "extension:", extension);
 
             let content;
             if (extension === ".pdf") {
@@ -158,6 +185,12 @@ async function main() {
                             `[WARN] Please install LibreOffice and ensure it is in your system PATH.`,
                         );
                     }
+                    diagLog(
+                        "DOC EXTRACTION FAILED:",
+                        filePath,
+                        "error:",
+                        err.message,
+                    );
                     return;
                 }
             } else {
@@ -168,6 +201,7 @@ async function main() {
                 console.error(
                     `[WARN] No text content extracted from ${filePath}. Skipping.`,
                 );
+                diagLog("EMPTY CONTENT:", filePath);
                 return;
             }
 
@@ -233,11 +267,22 @@ async function main() {
     );
     try {
         const existingFiles = await getAllFiles(CONFIG.DOCUMENTS_FOLDER);
-        const supportedFiles = existingFiles.filter((file) =>
-            CONFIG.SUPPORTED_EXTENSIONS.includes(
-                path.extname(file).toLowerCase(),
-            ),
-        );
+        // DIAGNOSTIC: Log file discovery details
+        diagLog("=== FILE DISCOVERY ===");
+        diagLog("Total files found:", existingFiles.length);
+
+        const supportedFiles = existingFiles.filter((file) => {
+            const ext = path.extname(file).toLowerCase();
+            const isSupported = CONFIG.SUPPORTED_EXTENSIONS.includes(ext);
+            if (!isSupported) {
+                diagLog("SKIPPING (unsupported):", file, "ext:", ext);
+            } else {
+                diagLog("WILL INDEX:", file, "ext:", ext);
+            }
+            return isSupported;
+        });
+
+        diagLog("Files to be indexed:", supportedFiles.length);
 
         if (supportedFiles.length > 0) {
             console.log(
