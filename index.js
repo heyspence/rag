@@ -107,11 +107,36 @@ async function main() {
                     `[DEBUG] Processing legacy Word document: ${filePath}`,
                 );
                 try {
+                    // Set LibreOffice path for Windows if not in PATH
+                    const isWindows = process.platform === "win32";
+                    if (isWindows) {
+                        const possiblePaths = [
+                            "C:\\Program Files\\LibreOffice\\program",
+                            "C:\\Program Files (x86)\\LibreOffice\\program",
+                            "C:\\Program Files\\LibreOffice 7\\program",
+                            "C:\\Program Files (x86)\\LibreOffice 7\\program",
+                        ];
+                        for (const libPath of possiblePaths) {
+                            if (
+                                fs.existsSync(path.join(libPath, "soffice.exe"))
+                            ) {
+                                process.env.SOFFICE_PATH = path.join(
+                                    libPath,
+                                    "soffice.exe",
+                                );
+                                console.error(
+                                    `[DEBUG] Found LibreOffice at: ${process.env.SOFFICE_PATH}`,
+                                );
+                                break;
+                            }
+                        }
+                    }
+
                     const tempFile = await tmp.file();
                     await fs.copy(filePath, tempFile.path);
 
                     const convertPromise = new Promise((resolve, reject) => {
-                        convert.toText(
+                        convert.convert(
                             fs.readFileSync(tempFile.path),
                             ".doc",
                             "text/plain",
@@ -129,8 +154,13 @@ async function main() {
                     );
                 } catch (err) {
                     console.error(
-                        `[WARN] Failed to extract text from .doc file ${filePath}: ${err.message}. Ensure LibreOffice is installed.`,
+                        `[WARN] Failed to extract text from .doc file ${filePath}: ${err.message}.`,
                     );
+                    if (err.message.includes("soffice")) {
+                        console.error(
+                            `[WARN] Please install LibreOffice and ensure it is in your system PATH, or restart the application.`,
+                        );
+                    }
                     return;
                 }
             } else {
