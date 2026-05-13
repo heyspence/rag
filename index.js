@@ -12,8 +12,10 @@ const path = require("path");
 require("dotenv").config();
 const pdf = require("pdf-parse");
 const mammoth = require("mammoth");
-const convert = require("libreoffice-convert");
+const { exec } = require("child_process");
+const util = require("util");
 const tmp = require("tmp-promise");
+const execPromise = util.promisify(exec);
 
 const EmbeddingEngine = require("./embeddingEngine");
 const VectorDatabase = require("./vectorDatabase");
@@ -107,48 +109,40 @@ async function main() {
                     `[DEBUG] Processing legacy Word document: ${filePath}`,
                 );
                 try {
-                    // Set LibreOffice path for Windows if not in PATH
-                    const isWindows = process.platform === "win32";
-                    if (isWindows) {
-                        const possiblePaths = [
-                            "C:\\Program Files\\LibreOffice\\program",
-                            "C:\\Program Files (x86)\\LibreOffice\\program",
-                            "C:\\Program Files\\LibreOffice 7\\program",
-                            "C:\\Program Files (x86)\\LibreOffice 7\\program",
-                        ];
-                        for (const libPath of possiblePaths) {
-                            if (
-                                fs.existsSync(path.join(libPath, "soffice.exe"))
-                            ) {
-                                process.env.SOFFICE_PATH = path.join(
-                                    libPath,
-                                    "soffice.exe",
-                                );
-                                console.error(
-                                    `[DEBUG] Found LibreOffice at: ${process.env.SOFFICE_PATH}`,
-                                );
-                                break;
-                            }
-                        }
+                    // Create temp directory for conversion output
+                    const tempDir = await tmp.dir();
+
+                    console.error(
+                        `[DEBUG] Converting .doc file using LibreOffice CLI...`,
+                    );
+
+                    // Use libreoffice --headless to convert .doc to text
+                    const { stdout, stderr } = await execPromise(
+                        `libreoffice --headless --convert-to txt --outdir "${tempDir.path}" "${filePath}"`,
+                    );
+
+                    if (stderr) {
+                        console.error(`[DEBUG] LibreOffice stderr: ${stderr}`);
                     }
 
-                    const tempFile = await tmp.file();
-                    await fs.copy(filePath, tempFile.path);
+                    // Find the converted .txt file
+                    const files = await fs.readdir(tempDir.path);
+                    const txtFile = files.find((f) => f.endsWith(".txt"));
 
-                    const convertPromise = new Promise((resolve, reject) => {
-                        convert.convert(
-                            fs.readFileSync(tempFile.path),
-                            ".doc",
-                            "text/plain",
-                            (err, buffer) => {
-                                if (err) reject(err);
-                                else resolve(buffer.toString());
-                            },
+                    if (!txtFile) {
+                        throw new Error(
+                            "No text file was created by LibreOffice conversion",
                         );
-                    });
+                    }
 
-                    content = await convertPromise;
-                    await tempFile.cleanup();
+                    content = await fs.readFile(
+                        path.join(tempDir.path, txtFile),
+                        "utf8",
+                    );
+
+                    // Cleanup temp files
+                    await fs.rm(tempDir.path, { recursive: true, force: true });
+
                     console.error(
                         `[DEBUG] Extracted ${content?.length || 0} characters from ${filePath}`,
                     );
@@ -156,9 +150,12 @@ async function main() {
                     console.error(
                         `[WARN] Failed to extract text from .doc file ${filePath}: ${err.message}.`,
                     );
-                    if (err.message.includes("soffice")) {
+                    if (
+                        err.message.includes("soffice") ||
+                        err.message.includes("libreoffice")
+                    ) {
                         console.error(
-                            `[WARN] Please install LibreOffice and ensure it is in your system PATH, or restart the application.`,
+                            `[WARN] Please install LibreOffice and ensure it is in your system PATH.`,
                         );
                     }
                     return;
