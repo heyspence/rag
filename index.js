@@ -12,6 +12,8 @@ const path = require("path");
 require("dotenv").config();
 const pdf = require("pdf-parse");
 const mammoth = require("mammoth");
+const convert = require("libreoffice-convert");
+const tmp = require("tmp-promise");
 
 const EmbeddingEngine = require("./embeddingEngine");
 const VectorDatabase = require("./vectorDatabase");
@@ -33,7 +35,7 @@ const CONFIG = {
         path.join(__dirname, "vector_store.json"),
     CHUNK_SIZE: 1000, // characters per chunk
     CHUNK_OVERLAP: 200,
-    SUPPORTED_EXTENSIONS: [".txt", ".md", ".pdf", ".docx"], // Only these types are indexed; others (e.g., images) are ignored
+    SUPPORTED_EXTENSIONS: [".txt", ".md", ".pdf", ".docx", ".doc"], // Only these types are indexed; others (e.g., images) are ignored
     INDEXING_CONCURRENCY:
         parseInt(process.env.RAG_INDEXING_CONCURRENCY, 10) || 5,
     SEARCH_TOP_K: parseInt(process.env.RAG_SEARCH_TOP_K, 10) || 10,
@@ -100,6 +102,37 @@ async function main() {
                 console.error(
                     `[DEBUG] Extracted ${content?.length || 0} characters from ${filePath}`,
                 );
+            } else if (extension === ".doc") {
+                console.error(
+                    `[DEBUG] Processing legacy Word document: ${filePath}`,
+                );
+                try {
+                    const tempFile = await tmp.file();
+                    await fs.copy(filePath, tempFile.path);
+
+                    const convertPromise = new Promise((resolve, reject) => {
+                        convert.toText(
+                            fs.readFileSync(tempFile.path),
+                            ".doc",
+                            "text/plain",
+                            (err, buffer) => {
+                                if (err) reject(err);
+                                else resolve(buffer.toString());
+                            },
+                        );
+                    });
+
+                    content = await convertPromise;
+                    await tempFile.cleanup();
+                    console.error(
+                        `[DEBUG] Extracted ${content?.length || 0} characters from ${filePath}`,
+                    );
+                } catch (err) {
+                    console.error(
+                        `[WARN] Failed to extract text from .doc file ${filePath}: ${err.message}. Ensure LibreOffice is installed.`,
+                    );
+                    return;
+                }
             } else {
                 content = await fs.readFile(filePath, "utf8");
             }
