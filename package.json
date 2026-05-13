@@ -9,6 +9,7 @@
         "dev": "node --watch index.js"
     },
     "dependencies": {
+        "@aws-sdk/client-ses": "^3.1045.0",
         "@modelcontextprotocol/sdk": "^1.0.1",
         "chokidar": "^3.6.0",
         "dotenv": "^16.4.5",
