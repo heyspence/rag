@@ -1,10 +1,10 @@
 # MCP-Compatible RAG Endpoint
 
-This project provides a Model Context Protocol (MCP) server that implements Retrieval-Augmented Generation (RAG) for local documents. It allows an LLM (via LM Studio or other MCP clients) to index and search through your local text, markdown, and PDF files using vector embeddings.
+This project provides a Model Context Protocol (MCP) server that implements Retrieval-Augmented Generation (RAG) for local documents. It allows an LLM (via LM Studio or other MCP clients) to index and search through your local text, markdown, PDF, and Word files using vector embeddings.
 
 ## Features
 
-- **Local Document Indexing**: Supports `.txt`, `.md`, and `.pdf` files.
+- **Local Document Indexing**: Supports `.txt`, `.md`, `.pdf`, and `.docx` (Word) files.
 - **Real-time Updates**: Automatically watches the documents folder for additions, changes, or deletions using `chokidar`.
 - **Persistent Storage**: Saves document embeddings to a local JSON file (`vector_store.json`) so you don't have to re-index everything on every restart.
 - **MCP Integration**: Provides standardized tools that allow LLMs to query your documents directly.
@@ -57,7 +57,7 @@ RAG_SEARCH_MIN_SCORE=0.5
 
 By default, the server looks for documents in the `./documents` folder relative to the project root. 
 - Create this folder if it doesn't exist.
-- Drop your `.pdf`, `.md`, or `.txt` files into this directory (subfolders are supported).
+- Drop your `.pdf`, `.md`, `.txt`, or `.docx` (Word) files into this directory (subfolders are supported).
 - The server will automatically index these files on startup and whenever a file is added/modified.
 
 ## LM Studio Integration

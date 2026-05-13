@@ -11,6 +11,7 @@ const fs = require("fs-extra");
 const path = require("path");
 require("dotenv").config();
 const pdf = require("pdf-parse");
+const mammoth = require("mammoth");
 
 const EmbeddingEngine = require("./embeddingEngine");
 const VectorDatabase = require("./vectorDatabase");
@@ -32,7 +33,7 @@ const CONFIG = {
         path.join(__dirname, "vector_store.json"),
     CHUNK_SIZE: 1000, // characters per chunk
     CHUNK_OVERLAP: 200,
-    SUPPORTED_EXTENSIONS: [".txt", ".md", ".pdf"], // Only these types are indexed; others (e.g., images) are ignored
+    SUPPORTED_EXTENSIONS: [".txt", ".md", ".pdf", ".docx"], // Only these types are indexed; others (e.g., images) are ignored
     INDEXING_CONCURRENCY:
         parseInt(process.env.RAG_INDEXING_CONCURRENCY, 10) || 5,
     SEARCH_TOP_K: parseInt(process.env.RAG_SEARCH_TOP_K, 10) || 10,
@@ -80,6 +81,22 @@ async function main() {
                 const dataBuffer = await fs.readFile(filePath);
                 const pdfData = await pdf(dataBuffer);
                 content = pdfData.text;
+                console.error(
+                    `[DEBUG] Extracted ${content?.length || 0} characters from ${filePath}`,
+                );
+            } else if (extension === ".docx") {
+                console.error(`[DEBUG] Processing Word document: ${filePath}`);
+                const dataBuffer = await fs.readFile(filePath);
+                const result = await mammoth.extractRawText({
+                    buffer: dataBuffer,
+                });
+                content = result.value;
+                if (result.messages.length > 0) {
+                    console.error(
+                        `[DEBUG] Mammoth messages for ${filePath}:`,
+                        result.messages,
+                    );
+                }
                 console.error(
                     `[DEBUG] Extracted ${content?.length || 0} characters from ${filePath}`,
                 );
