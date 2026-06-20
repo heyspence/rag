@@ -1,0 +1,296 @@
+14:23:38.360 ## Debug    ## IPC - Got a message : bytes received =  112 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "getMissionProgressTransmitter",
+    "source": 9
+}
+ IPC - ========== ## :0, )
+14:23:38.360 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "getMissionProgressTransmitter"))("source", QVariant(double, 9))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+14:23:38.361 ## Debug    ## IPC - ============== ## :0, )
+14:23:38.361 ## Debug    ## IPC - sending  "getMissionProgressTransmitter"  message to  "UiBackend" ## :0, )
+14:23:38.361 ## Debug    ## {
+} ## :0, )
+14:23:38.361 ## Debug    ## IPC - ============== ## :0, )
+14:25:40.413 ## Debug    ## IPC - Got a message : bytes received =  524 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "duration": 2,
+    "id": 0,
+    "missionType": "relativeTime",
+    "msgClass": "transmit",
+    "source": 10,
+    "startTime": null,
+    "transmitterTask": {
+        "bandwidth": 380000,
+        "duration": 15,
+        "frequency": 535000000,
+        "id": 0,
+        "powerLevel": "Low",
+        "txfile": "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6"
+    }
+}
+ IPC - ========== ## :0, )
+14:25:40.414 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("duration", QVariant(double, 2))("id", QVariant(double, 0))("missionType", QVariant(QString, "relativeTime"))("msgClass", QVariant(QString, "transmit"))("source", QVariant(double, 10))("startTime", QVariant(std::nullptr_t, (nullptr)))("transmitterTask", QVariant(QVariantMap, QMap(("bandwidth", QVariant(double, 380000))("duration", QVariant(double, 15))("frequency", QVariant(double, 5.35e+08))("id", QVariant(double, 0))("powerLevel", QVariant(QString, "Low"))("txfile", QVariant(QString, "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6")))))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+14:25:40.414 ## Debug    ## Sucessfully Initialized GPIO:  24 ## :0, )
+14:25:40.415 ## Debug    ## TURNED ON GPIO 24 ## :0, )
+14:25:40.415 ## Debug    ## prepping to send file, got this message: "{\n    \"bandwidth\": 380000,\n    \"duration\": 15,\n    \"frequency\": 535000000,\n    \"id\": 0,\n    \"powerLevel\": \"Low\",\n    \"txfile\": \"/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6\"\n}\n" ## ../transmitter/sdr.cpp:73, void Sdr::sendFile(QVariantMap))
+14:25:40.415 ## Info     ## Setting TX frequency to  535  MHz ## ../transmitter/uhdsdr.cpp:357, virtual void UhdSdr::_setTxFrequency(double))
+14:25:40.444 ## Info     ## Setting Tx Sampling Rate to  0.38  MHz ## ../transmitter/uhdsdr.cpp:252, virtual void UhdSdr::_setTxSamplingRate(double))
+14:25:40.446 ## Debug    ## Beginning transmission ## ../transmitter/uhdtxworker.cpp:54, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:25:40.446 ## Debug    ## Size of file is:  49167096  ( 6.14589  MS) ## ../transmitter/uhdtxworker.cpp:95, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:25:40.447 ## Debug    ## Requested transmit duration is  15  seconds, need to send  5.7  MS ## ../transmitter/uhdtxworker.cpp:96, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:25:55.303 ## Debug    ## Transmitter sent  5.71  megasamples in  14.8558  seconds. ## ../transmitter/uhdtxworker.cpp:140, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:25:55.308 ## Debug    ## Transmitter function reached end of work function ## ../transmitter/uhdtxworker.cpp:163, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:25:55.308 ## Debug    ## IPC - ============== ## :0, )
+14:25:55.308 ## Debug    ## IPC - sending  "transmitStopped"  message to  "scheduler" ## :0, )
+14:25:55.309 ## Debug    ## {
+} ## :0, )
+14:25:55.309 ## Debug    ## IPC - ============== ## :0, )
+14:25:55.309 ## Debug    ## IPC - ============== ## :0, )
+14:25:55.309 ## Debug    ## IPC - sending  "transmitStopped"  message to  "UiBackend" ## :0, )
+14:25:55.309 ## Debug    ## {
+} ## :0, )
+14:25:55.309 ## Debug    ## IPC - ============== ## :0, )
+14:25:55.310 ## Debug    ## TURNED OFF GPIO 24 ## :0, )
+14:25:55.310 ## Debug    ## Sucessfully Un-initialized GPIO: 24 ## :0, )
+14:26:00.413 ## Debug    ## IPC - Got a message : bytes received =  508 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "duration": 5,
+    "id": 1,
+    "missionType": "relativeTime",
+    "msgClass": "transmit",
+    "source": 10,
+    "startTime": null,
+    "transmitterTask": {
+        "bandwidth": 380000,
+        "duration": 15,
+        "frequency": 1200000000,
+        "id": 1,
+        "powerLevel": "Low",
+        "txfile": "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6"
+    }
+}
+ IPC - ========== ## :0, )
+14:26:00.414 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("duration", QVariant(double, 5))("id", QVariant(double, 1))("missionType", QVariant(QString, "relativeTime"))("msgClass", QVariant(QString, "transmit"))("source", QVariant(double, 10))("startTime", QVariant(std::nullptr_t, (nullptr)))("transmitterTask", QVariant(QVariantMap, QMap(("bandwidth", QVariant(double, 380000))("duration", QVariant(double, 15))("frequency", QVariant(double, 1.2e+09))("id", QVariant(double, 1))("powerLevel", QVariant(QString, "Low"))("txfile", QVariant(QString, "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6")))))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+14:26:00.414 ## Debug    ## Sucessfully Initialized GPIO:  24 ## :0, )
+14:26:00.415 ## Debug    ## TURNED ON GPIO 24 ## :0, )
+14:26:00.415 ## Debug    ## prepping to send file, got this message: "{\n    \"bandwidth\": 380000,\n    \"duration\": 15,\n    \"frequency\": 1200000000,\n    \"id\": 1,\n    \"powerLevel\": \"Low\",\n    \"txfile\": \"/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6\"\n}\n" ## ../transmitter/sdr.cpp:73, void Sdr::sendFile(QVariantMap))
+14:26:00.415 ## Info     ## Setting TX frequency to  1200  MHz ## ../transmitter/uhdsdr.cpp:357, virtual void UhdSdr::_setTxFrequency(double))
+14:26:00.444 ## Info     ## Setting Tx Sampling Rate to  0.38  MHz ## ../transmitter/uhdsdr.cpp:252, virtual void UhdSdr::_setTxSamplingRate(double))
+14:26:00.446 ## Debug    ## Beginning transmission ## ../transmitter/uhdtxworker.cpp:54, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:00.446 ## Debug    ## Size of file is:  49167096  ( 6.14589  MS) ## ../transmitter/uhdtxworker.cpp:95, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:00.447 ## Debug    ## Requested transmit duration is  15  seconds, need to send  5.7  MS ## ../transmitter/uhdtxworker.cpp:96, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:15.303 ## Debug    ## Transmitter sent  5.71  megasamples in  14.8559  seconds. ## ../transmitter/uhdtxworker.cpp:140, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:15.308 ## Debug    ## Transmitter function reached end of work function ## ../transmitter/uhdtxworker.cpp:163, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:15.308 ## Debug    ## IPC - ============== ## :0, )
+14:26:15.308 ## Debug    ## IPC - sending  "transmitStopped"  message to  "scheduler" ## :0, )
+14:26:15.309 ## Debug    ## {
+} ## :0, )
+14:26:15.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:15.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:15.309 ## Debug    ## IPC - sending  "transmitStopped"  message to  "UiBackend" ## :0, )
+14:26:15.309 ## Debug    ## {
+} ## :0, )
+14:26:15.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:15.310 ## Debug    ## TURNED OFF GPIO 24 ## :0, )
+14:26:15.310 ## Debug    ## Sucessfully Un-initialized GPIO: 24 ## :0, )
+14:26:18.413 ## Debug    ## IPC - Got a message : bytes received =  508 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "duration": 3,
+    "id": 2,
+    "missionType": "relativeTime",
+    "msgClass": "transmit",
+    "source": 10,
+    "startTime": null,
+    "transmitterTask": {
+        "bandwidth": 380000,
+        "duration": 15,
+        "frequency": 3500000000,
+        "id": 2,
+        "powerLevel": "Low",
+        "txfile": "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6"
+    }
+}
+ IPC - ========== ## :0, )
+14:26:18.414 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("duration", QVariant(double, 3))("id", QVariant(double, 2))("missionType", QVariant(QString, "relativeTime"))("msgClass", QVariant(QString, "transmit"))("source", QVariant(double, 10))("startTime", QVariant(std::nullptr_t, (nullptr)))("transmitterTask", QVariant(QVariantMap, QMap(("bandwidth", QVariant(double, 380000))("duration", QVariant(double, 15))("frequency", QVariant(double, 3.5e+09))("id", QVariant(double, 2))("powerLevel", QVariant(QString, "Low"))("txfile", QVariant(QString, "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6")))))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+14:26:18.414 ## Debug    ## Sucessfully Initialized GPIO:  24 ## :0, )
+14:26:18.415 ## Debug    ## TURNED ON GPIO 24 ## :0, )
+14:26:18.415 ## Debug    ## prepping to send file, got this message: "{\n    \"bandwidth\": 380000,\n    \"duration\": 15,\n    \"frequency\": 3500000000,\n    \"id\": 2,\n    \"powerLevel\": \"Low\",\n    \"txfile\": \"/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6\"\n}\n" ## ../transmitter/sdr.cpp:73, void Sdr::sendFile(QVariantMap))
+14:26:18.415 ## Info     ## Setting TX frequency to  3500  MHz ## ../transmitter/uhdsdr.cpp:357, virtual void UhdSdr::_setTxFrequency(double))
+14:26:18.444 ## Info     ## Setting Tx Sampling Rate to  0.38  MHz ## ../transmitter/uhdsdr.cpp:252, virtual void UhdSdr::_setTxSamplingRate(double))
+14:26:18.446 ## Debug    ## Beginning transmission ## ../transmitter/uhdtxworker.cpp:54, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:18.446 ## Debug    ## Size of file is:  49167096  ( 6.14589  MS) ## ../transmitter/uhdtxworker.cpp:95, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:18.447 ## Debug    ## Requested transmit duration is  15  seconds, need to send  5.7  MS ## ../transmitter/uhdtxworker.cpp:96, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:33.303 ## Debug    ## Transmitter sent  5.71  megasamples in  14.8559  seconds. ## ../transmitter/uhdtxworker.cpp:140, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:33.308 ## Debug    ## Transmitter function reached end of work function ## ../transmitter/uhdtxworker.cpp:163, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:33.308 ## Debug    ## IPC - ============== ## :0, )
+14:26:33.308 ## Debug    ## IPC - sending  "transmitStopped"  message to  "scheduler" ## :0, )
+14:26:33.309 ## Debug    ## {
+} ## :0, )
+14:26:33.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:33.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:33.309 ## Debug    ## IPC - sending  "transmitStopped"  message to  "UiBackend" ## :0, )
+14:26:33.309 ## Debug    ## {
+} ## :0, )
+14:26:33.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:33.310 ## Debug    ## TURNED OFF GPIO 24 ## :0, )
+14:26:33.310 ## Debug    ## Sucessfully Un-initialized GPIO: 24 ## :0, )
+14:26:38.413 ## Debug    ## IPC - Got a message : bytes received =  508 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "duration": 5,
+    "id": 3,
+    "missionType": "relativeTime",
+    "msgClass": "transmit",
+    "source": 10,
+    "startTime": null,
+    "transmitterTask": {
+        "bandwidth": 380000,
+        "duration": 15,
+        "frequency": 5800000000,
+        "id": 3,
+        "powerLevel": "Low",
+        "txfile": "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6"
+    }
+}
+ IPC - ========== ## :0, )
+14:26:38.414 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("duration", QVariant(double, 5))("id", QVariant(double, 3))("missionType", QVariant(QString, "relativeTime"))("msgClass", QVariant(QString, "transmit"))("source", QVariant(double, 10))("startTime", QVariant(std::nullptr_t, (nullptr)))("transmitterTask", QVariant(QVariantMap, QMap(("bandwidth", QVariant(double, 380000))("duration", QVariant(double, 15))("frequency", QVariant(double, 5.8e+09))("id", QVariant(double, 3))("powerLevel", QVariant(QString, "Low"))("txfile", QVariant(QString, "/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6")))))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+14:26:38.414 ## Debug    ## Sucessfully Initialized GPIO:  24 ## :0, )
+14:26:38.415 ## Debug    ## TURNED ON GPIO 24 ## :0, )
+14:26:38.415 ## Debug    ## prepping to send file, got this message: "{\n    \"bandwidth\": 380000,\n    \"duration\": 15,\n    \"frequency\": 5800000000,\n    \"id\": 3,\n    \"powerLevel\": \"Low\",\n    \"txfile\": \"/opt/thracian/var/generated/f9032615761f94caf72289fe8eb991489808019b4cba2802b838b46b2a15411efc42c42ed30c08b046f44ba50e366d3dc6b20f5425d22cd03f0370c2eefbced6\"\n}\n" ## ../transmitter/sdr.cpp:73, void Sdr::sendFile(QVariantMap))
+14:26:38.415 ## Info     ## Setting TX frequency to  5800  MHz ## ../transmitter/uhdsdr.cpp:357, virtual void UhdSdr::_setTxFrequency(double))
+14:26:38.443 ## Info     ## Setting Tx Sampling Rate to  0.38  MHz ## ../transmitter/uhdsdr.cpp:252, virtual void UhdSdr::_setTxSamplingRate(double))
+14:26:38.445 ## Debug    ## Beginning transmission ## ../transmitter/uhdtxworker.cpp:54, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:38.446 ## Debug    ## Size of file is:  49167096  ( 6.14589  MS) ## ../transmitter/uhdtxworker.cpp:95, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:38.446 ## Debug    ## Requested transmit duration is  15  seconds, need to send  5.7  MS ## ../transmitter/uhdtxworker.cpp:96, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:53.302 ## Debug    ## Transmitter sent  5.71  megasamples in  14.8557  seconds. ## ../transmitter/uhdtxworker.cpp:140, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:53.307 ## Debug    ## Transmitter function reached end of work function ## ../transmitter/uhdtxworker.cpp:163, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+14:26:53.307 ## Debug    ## IPC - ============== ## :0, )
+14:26:53.308 ## Debug    ## IPC - sending  "transmitStopped"  message to  "scheduler" ## :0, )
+14:26:53.308 ## Debug    ## {
+} ## :0, )
+14:26:53.308 ## Debug    ## IPC - ============== ## :0, )
+14:26:53.308 ## Debug    ## IPC - ============== ## :0, )
+14:26:53.308 ## Debug    ## IPC - sending  "transmitStopped"  message to  "UiBackend" ## :0, )
+14:26:53.308 ## Debug    ## {
+} ## :0, )
+14:26:53.309 ## Debug    ## IPC - ============== ## :0, )
+14:26:53.309 ## Debug    ## TURNED OFF GPIO 24 ## :0, )
+14:26:53.309 ## Debug    ## Sucessfully Un-initialized GPIO: 24 ## :0, )
+23:00:42.339 ## Debug    ## IPC - Got a message : bytes received =  112 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "getMissionProgressTransmitter",
+    "source": 9
+}
+ IPC - ========== ## :0, )
+23:00:42.339 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "getMissionProgressTransmitter"))("source", QVariant(double, 9))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:00:42.340 ## Debug    ## IPC - ============== ## :0, )
+23:00:42.340 ## Debug    ## IPC - sending  "getMissionProgressTransmitter"  message to  "UiBackend" ## :0, )
+23:00:42.340 ## Debug    ## {
+} ## :0, )
+23:00:42.340 ## Debug    ## IPC - ============== ## :0, )
+23:01:00.632 ## Debug    ## IPC - Got a message : bytes received =  112 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "getMissionProgressTransmitter",
+    "source": 9
+}
+ IPC - ========== ## :0, )
+23:01:00.632 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "getMissionProgressTransmitter"))("source", QVariant(double, 9))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:01:00.633 ## Debug    ## IPC - ============== ## :0, )
+23:01:00.633 ## Debug    ## IPC - sending  "getMissionProgressTransmitter"  message to  "UiBackend" ## :0, )
+23:01:00.633 ## Debug    ## {
+} ## :0, )
+23:01:00.633 ## Debug    ## IPC - ============== ## :0, )
+23:01:04.414 ## Debug    ## IPC - Got a message : bytes received =  524 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "duration": 5,
+    "id": 0,
+    "missionType": "relativeTime",
+    "msgClass": "transmit",
+    "source": 10,
+    "startTime": null,
+    "transmitterTask": {
+        "bandwidth": 380000,
+        "duration": 45,
+        "frequency": 100002000,
+        "id": 0,
+        "powerLevel": "Low",
+        "txfile": "/opt/thracian/var/generated/7057c0a417da8bb046cd33619069e8a0a413c3f6451366ba407512d086a5af76d3ebf6af556224536c7fd9ca878dfe974efca8963a53454ac8799e1a336a37fb"
+    }
+}
+ IPC - ========== ## :0, )
+23:01:04.414 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("duration", QVariant(double, 5))("id", QVariant(double, 0))("missionType", QVariant(QString, "relativeTime"))("msgClass", QVariant(QString, "transmit"))("source", QVariant(double, 10))("startTime", QVariant(std::nullptr_t, (nullptr)))("transmitterTask", QVariant(QVariantMap, QMap(("bandwidth", QVariant(double, 380000))("duration", QVariant(double, 45))("frequency", QVariant(double, 1.00002e+08))("id", QVariant(double, 0))("powerLevel", QVariant(QString, "Low"))("txfile", QVariant(QString, "/opt/thracian/var/generated/7057c0a417da8bb046cd33619069e8a0a413c3f6451366ba407512d086a5af76d3ebf6af556224536c7fd9ca878dfe974efca8963a53454ac8799e1a336a37fb")))))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:01:04.415 ## Debug    ## Sucessfully Initialized GPIO:  28 ## :0, )
+23:01:04.415 ## Debug    ## TURNED ON GPIO 28 ## :0, )
+23:01:04.415 ## Debug    ## prepping to send file, got this message: "{\n    \"bandwidth\": 380000,\n    \"duration\": 45,\n    \"frequency\": 100002000,\n    \"id\": 0,\n    \"powerLevel\": \"Low\",\n    \"txfile\": \"/opt/thracian/var/generated/7057c0a417da8bb046cd33619069e8a0a413c3f6451366ba407512d086a5af76d3ebf6af556224536c7fd9ca878dfe974efca8963a53454ac8799e1a336a37fb\"\n}\n" ## ../transmitter/sdr.cpp:73, void Sdr::sendFile(QVariantMap))
+23:01:04.416 ## Info     ## Setting TX frequency to  100.002  MHz ## ../transmitter/uhdsdr.cpp:357, virtual void UhdSdr::_setTxFrequency(double))
+23:01:04.445 ## Info     ## Setting Tx Sampling Rate to  0.38  MHz ## ../transmitter/uhdsdr.cpp:252, virtual void UhdSdr::_setTxSamplingRate(double))
+23:01:04.447 ## Debug    ## Beginning transmission ## ../transmitter/uhdtxworker.cpp:54, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+23:01:04.447 ## Debug    ## Size of file is:  83789504  ( 10.4737  MS) ## ../transmitter/uhdtxworker.cpp:95, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+23:01:04.448 ## Debug    ## Requested transmit duration is  45  seconds, need to send  17.1  MS ## ../transmitter/uhdtxworker.cpp:96, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+23:01:21.884 ## Debug    ## IPC - Got a message : bytes received =  100 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "stopTransmission",
+    "source": 10
+}
+ IPC - ========== ## :0, )
+23:01:21.884 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "stopTransmission"))("source", QVariant(double, 10))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:01:21.885 ## Debug    ## TURNED OFF GPIO 28 ## :0, )
+23:01:21.885 ## Debug    ## Sucessfully Un-initialized GPIO: 28 ## :0, )
+23:01:21.909 ## Debug    ## Transmitter sent  6.7  megasamples in  17.4612  seconds. ## ../transmitter/uhdtxworker.cpp:140, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+23:01:21.914 ## Debug    ## Transmitter function reached end of work function ## ../transmitter/uhdtxworker.cpp:163, virtual void UhdTxWorker::on_other_sendFile(QVariantMap))
+23:01:21.914 ## Debug    ## IPC - ============== ## :0, )
+23:01:21.915 ## Debug    ## IPC - sending  "transmitStopped"  message to  "scheduler" ## :0, )
+23:01:21.915 ## Debug    ## {
+} ## :0, )
+23:01:21.915 ## Debug    ## IPC - ============== ## :0, )
+23:01:21.915 ## Debug    ## IPC - ============== ## :0, )
+23:01:21.916 ## Debug    ## IPC - sending  "transmitStopped"  message to  "UiBackend" ## :0, )
+23:01:21.916 ## Debug    ## {
+} ## :0, )
+23:01:21.916 ## Debug    ## IPC - ============== ## :0, )
+23:01:21.916 ## Debug    ## Unable to open "/sys/class/gpio/gpio28/value" ## :0, )
+23:01:21.917 ## Debug    ## Error writing to /sys/class/gpio/unexport ## :0, )
+23:01:27.101 ## Debug    ## IPC - Got a message : bytes received =  112 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "getMissionProgressTransmitter",
+    "source": 9
+}
+ IPC - ========== ## :0, )
+23:01:27.101 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "getMissionProgressTransmitter"))("source", QVariant(double, 9))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:01:27.102 ## Debug    ## IPC - ============== ## :0, )
+23:01:27.102 ## Debug    ## IPC - sending  "getMissionProgressTransmitter"  message to  "UiBackend" ## :0, )
+23:01:27.102 ## Debug    ## {
+} ## :0, )
+23:01:27.102 ## Debug    ## IPC - ============== ## :0, )
+23:32:51.581 ## Debug    ## IPC - Got a message : bytes received =  112 
+ThracianIpc ==========
+ {
+    "destination": 4,
+    "msgClass": "getMissionProgressTransmitter",
+    "source": 9
+}
+ IPC - ========== ## :0, )
+23:32:51.581 ## Debug    ## IPC Message Received QMap(("destination", QVariant(double, 4))("msgClass", QVariant(QString, "getMissionProgressTransmitter"))("source", QVariant(double, 9))) ## ../transmitter/controller.cpp:84, void Controller::on_ipc_receivedMessage(QVariantMap))
+23:32:51.582 ## Debug    ## IPC - ============== ## :0, )
+23:32:51.582 ## Debug    ## IPC - sending  "getMissionProgressTransmitter"  message to  "UiBackend" ## :0, )
+23:32:51.582 ## Debug    ## {
+} ## :0, )
+23:32:51.582 ## Debug    ## IPC - ============== ## :0, )

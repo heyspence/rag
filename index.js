@@ -20,6 +20,7 @@ const execPromise = util.promisify(exec);
 const EmbeddingEngine = require("./embeddingEngine");
 const VectorDatabase = require("./vectorDatabase");
 const EmailService = require("./emailService");
+const { getToolDefinitions, handleToolCall } = require("./tools");
 
 /**
  * Configuration for the RAG Endpoint
@@ -92,7 +93,7 @@ async function main() {
     /**
      * Logic to index a single file
      */
-    async function indexFile(filePath, isBulkIndex = false) {
+    async function indexFile(filePath) {
         try {
             const extension = path.extname(filePath).toLowerCase();
             if (!CONFIG.SUPPORTED_EXTENSIONS.includes(extension)) {
@@ -208,14 +209,16 @@ async function main() {
             const chunks = chunkText(content);
             const embeddings = await embeddingEngine.embedBatch(chunks);
 
-            chunks.forEach((chunk, i) => {
+            for (let i = 0; i < chunks.length; i++) {
                 const chunkId = `${filePath}#${i}`;
-                vectorDb.upsertDocument(chunkId, chunk, embeddings[i]);
-            });
-
-            if (!isBulkIndex) {
-                await vectorDb.save();
+                await vectorDb.upsertDocument(
+                    chunkId,
+                    chunks[i],
+                    embeddings[i],
+                );
             }
+
+            await vectorDb.save();
         } catch (error) {
             console.error(
                 `[RAG Server] Error indexing ${filePath}: ${error.message}`,
@@ -289,10 +292,8 @@ async function main() {
                 `[RAG Server] Found ${supportedFiles.length} files to index`,
             );
             for (const file of supportedFiles) {
-                await indexFile(file, true); // isBulkIndex = true
+                await indexFile(file, false); // isBulkIndex = false, save after each
             }
-            // Save once after bulk indexing completes
-            await vectorDb.save();
             console.log(
                 `[RAG Server] Bulk indexing complete. Total documents in store: ${vectorDb.listDocuments().length}`,
             );
@@ -333,365 +334,30 @@ async function main() {
         },
     );
 
-    // Define Tools
+    // Define Tools - use shared tool definitions
     server.setRequestHandler(ListToolsRequestSchema, async () => {
         return {
-            tools: [
-                {
-                    name: "search_documents",
-                    description:
-                        "Search the local document index for relevant information based on a query.",
-                    inputSchema: {
-                        type: "object",
-                        properties: {
-                            query: {
-                                type: "string",
-                                description: "The search query",
-                            },
-                            topK: {
-                                type: "number",
-                                description: "Number of results to return",
-                                default: 5,
-                            },
-                        },
-                        required: ["query"],
-                    },
-                },
-                {
-                    name: "index_status",
-                    description:
-                        "Get the current status and list of indexed documents.",
-                    inputSchema: { type: "object", properties: {} },
-                },
-                {
-                    name: "list_indexed_files",
-                    description:
-                        "List only the names of all currently indexed files.",
-                    inputSchema: { type: "object", properties: {} },
-                },
-                {
-                    name: "send_email",
-                    description:
-                        "Send an email using AWS SES. Requires subject and body parameters. The 'to' parameter is optional - if not provided, the email will be sent to the default recipient configured in .env (DEFAULT_EMAIL_RECIPIENT).",
-                    inputSchema: {
-                        type: "object",
-                        properties: {
-                            to: {
-                                type: "string",
-                                description:
-                                    "Recipient email address (e.g., user@example.com). Optional - uses DEFAULT_EMAIL_RECIPIENT from .env if not provided.",
-                            },
-                            subject: {
-                                type: "string",
-                                description: "Email subject line",
-                            },
-                            body: {
-                                type: "string",
-                                description: "Plain text content of the email",
-                            },
-                            htmlBody: {
-                                type: "string",
-                                description:
-                                    "Optional HTML content for rich formatting",
-                            },
-                            from: {
-                                type: "string",
-                                description:
-                                    "Sender email address (defaults to noreply@bookservo.com)",
-                            },
-                        },
-                        required: ["subject", "body"],
-                    },
-                },
-                {
-                    name: "send_bulk_email",
-                    description:
-                        "Send the same email to multiple recipients using AWS SES.",
-                    inputSchema: {
-                        type: "object",
-                        properties: {
-                            recipients: {
-                                type: "array",
-                                items: { type: "string" },
-                                description:
-                                    "Array of recipient email addresses",
-                            },
-                            subject: {
-                                type: "string",
-                                description: "Email subject line",
-                            },
-                            body: {
-                                type: "string",
-                                description: "Plain text content of the email",
-                            },
-                            htmlBody: {
-                                type: "string",
-                                description:
-                                    "Optional HTML content for rich formatting",
-                            },
-                        },
-                        required: ["recipients", "subject", "body"],
-                    },
-                },
-                {
-                    name: "check_email_status",
-                    description:
-                        "Check the configuration status of the AWS SES email service.",
-                    inputSchema: { type: "object", properties: {} },
-                },
-            ],
+            tools: getToolDefinitions(),
         };
     });
 
     server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const { name, arguments: args } = request.params;
 
-        if (name === "search_documents") {
-            const query = args.query;
-            const topK = args.topK || CONFIG.SEARCH_TOP_K;
+        // Log tool call
+        console.log(
+            `[LM Studio Server] Tool call: ${name}`,
+            JSON.stringify(args, null, 2),
+        );
 
-            try {
-                const queryEmbedding = await embeddingEngine.embed(query);
-                const results = await vectorDb.search(queryEmbedding, topK);
-
-                // Filter results by the minimum match score requirement
-                const filteredResults = results.filter(
-                    (res) => res.score >= CONFIG.SEARCH_MIN_SCORE,
-                );
-
-                if (filteredResults.length === 0) {
-                    return {
-                        content: [
-                            {
-                                type: "text",
-                                text: `No documents found meeting the minimum similarity score of ${CONFIG.SEARCH_MIN_SCORE}.`,
-                            },
-                        ],
-                    };
-                }
-
-                const formattedResults = filteredResults
-                    .map(
-                        (res, i) =>
-                            `${i + 1}. [Score: ${res.score.toFixed(4)}] Source: ${res.docId}\nContent: ${res.content}`,
-                    )
-                    .join("\n\n");
-
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: `Top ${filteredResults.length} relevant results (Threshold: ${CONFIG.SEARCH_MIN_SCORE}):\n\n${formattedResults}`,
-                        },
-                    ],
-                };
-            } catch (error) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Search error: ${error.message}`,
-                        },
-                    ],
-                };
-            }
-        }
-
-        if (name === "index_status") {
-            const docs = vectorDb.listDocuments();
-            // Extract unique file paths from chunk IDs
-            const files = [...new Set(docs.map((id) => id.split("#")[0]))];
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Indexing active. Total chunks: ${docs.length}. Unique files indexed: ${files.length}.\nFiles:\n${files.join("\n")}`,
-                    },
-                ],
-            };
-        }
-
-        if (name === "list_indexed_files") {
-            const docs = vectorDb.listDocuments();
-            // Extract unique file paths, then get just the filename using path.basename
-            const files = [
-                ...new Set(docs.map((id) => path.basename(id.split("#")[0]))),
-            ];
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: `Indexed Files:\n${files.join("\n")}`,
-                    },
-                ],
-            };
-        }
-
-        if (name === "send_email") {
-            const { to, subject, body, htmlBody, from } = args;
-
-            // Validate required parameters (to is optional - will use default if not provided)
-            if (!subject || !body) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: "Error: Missing required parameters. 'subject' and 'body' are required.",
-                        },
-                    ],
-                };
-            }
-
-            // Validate email format if 'to' is provided
-            if (to && !EmailService.isValidEmail(to)) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error: Invalid email address format: ${to}`,
-                        },
-                    ],
-                };
-            }
-
-            try {
-                const result = await EmailService.sendEmail({
-                    to,
-                    subject,
-                    body,
-                    htmlBody: htmlBody || null,
-                    from,
-                });
-
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: `✅ Email sent successfully!\n\nMessage ID: ${result.messageId}\nTo: ${result.to.join(", ")}\nFrom: ${result.from}\nSubject: ${result.subject}`,
-                        },
-                    ],
-                };
-            } catch (error) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error sending email: ${error.message}`,
-                        },
-                    ],
-                };
-            }
-        }
-
-        if (name === "send_bulk_email") {
-            const { recipients, subject, body, htmlBody } = args;
-
-            // Validate required parameters
-            if (!recipients || !subject || !body) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: "Error: Missing required parameters. 'recipients', 'subject', and 'body' are required.",
-                        },
-                    ],
-                };
-            }
-
-            if (!Array.isArray(recipients) || recipients.length === 0) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: "Error: 'recipients' must be a non-empty array of email addresses.",
-                        },
-                    ],
-                };
-            }
-
-            // Validate all email formats
-            const invalidEmails = recipients.filter(
-                (email) => !EmailService.isValidEmail(email),
-            );
-            if (invalidEmails.length > 0) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error: Invalid email address format(s): ${invalidEmails.join(", ")}`,
-                        },
-                    ],
-                };
-            }
-
-            try {
-                const result = await EmailService.sendBulkEmail({
-                    recipients,
-                    subject,
-                    body,
-                    htmlBody: htmlBody || null,
-                });
-
-                const summary = `📧 Bulk email results:\nTotal: ${result.total}\nSuccessful: ${result.successful}\nFailed: ${result.failed}\n\n`;
-                const details = result.results
-                    .map(
-                        (r) =>
-                            `${r.status === "sent" ? "✅" : "❌"} ${r.recipient}: ${r.status === "sent" ? r.messageId : r.error}`,
-                    )
-                    .join("\n");
-
-                return {
-                    content: [
-                        {
-                            type: "text",
-                            text: summary + details,
-                        },
-                    ],
-                };
-            } catch (error) {
-                return {
-                    isError: true,
-                    content: [
-                        {
-                            type: "text",
-                            text: `Error sending bulk email: ${error.message}`,
-                        },
-                    ],
-                };
-            }
-        }
-
-        if (name === "check_email_status") {
-            const status = EmailService.getServiceStatus();
-
-            const statusText =
-                `📬 AWS SES Email Service Status:\n\n` +
-                `Configured: ${status.configured ? "✅ Yes" : "❌ No"}\n` +
-                `Region: ${status.region}\n` +
-                `Default From: ${status.fromEmail}\n` +
-                `Default Recipient: ${status.defaultRecipient}\n\n` +
-                (status.configured
-                    ? "Email tools are ready to use."
-                    : "Please configure AWS credentials in .env file:\n- AWS_ACCESS_KEY_ID\n- AWS_SECRET_ACCESS_KEY\n- AWS_REGION");
-
-            return {
-                content: [
-                    {
-                        type: "text",
-                        text: statusText,
-                    },
-                ],
-            };
-        }
-
-        throw new Error(`Tool not found: ${name}`);
+        // Use shared tool handler with local component instances
+        return handleToolCall(name, args, {
+            embeddingEngine,
+            vectorDb,
+            config: CONFIG,
+            path,
+            EmailService,
+        });
     });
 
     // Start Server

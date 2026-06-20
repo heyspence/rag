@@ -1,0 +1,90 @@
+# Test Document for RAG Endpoint
+
+This is a test document created to verify the RAG (Retrieval-Augmented Generation) endpoint functionality.
+
+## About This Project
+
+The RAG endpoint is designed to index and search through local documents using vector embeddings. It supports text files, markdown files, and PDF documents. The system uses an embedding API to generate numerical representations of text chunks, which are then stored in a vector database for efficient similarity search.
+
+## Key Features
+
+1. **Local Document Indexing**: Supports .txt, .md, and .pdf files
+2. **Real-time Updates**: Automatically watches the documents folder for changes using chokidar
+3. **Persistent Storage**: Saves document embeddings to vector_store.json
+4. **Email Integration**: Can receive emails via IMAP with [prompt] in the subject line
+5. **MCP Compatible**: Works with Model Context Protocol for LLM integration
+
+## Email Processing Workflow
+
+When an email arrives at your Gmail account with "[prompt]" in the subject:
+1. The IMAP service detects the new message within seconds
+2. The email content is extracted and prepared for embedding
+3. An embedding vector is generated using the configured embedding API
+4. The vector database is searched for similar document chunks
+5. Relevant results are returned with similarity scores
+
+## Technical Configuration
+
+The system uses the following default settings:
+- Chunk Size: 1000 characters per chunk
+- Chunk Overlap: 200 characters between chunks
+- Search Top K: 10 results per query
+- Minimum Score Threshold: 0.5 (on a scale of 0.0 to 1.0)
+
+## AWS SES Integration
+
+The email service supports sending emails via Amazon Simple Email Service (SES). Configuration requires:
+- AWS_ACCESS_KEY_ID
+- AWS_SECRET_ACCESS_KEY
+- AWS_REGION (default: us-east-2)
+- FROM_EMAIL sender address
+
+## IMAP Email Receiving
+
+For receiving emails, the system connects directly to Gmail's IMAP server on port 993 using TLS encryption. This requires:
+- IMAP_USER: Your Gmail address
+- IMAP_PASSWORD: An app-specific password from Google Account settings
+- EMAIL_SUBJECT_TAG: The subject filter (default: [prompt])
+
+## Testing Instructions
+
+To test the system:
+1. Ensure documents are placed in the ./documents folder
+2. Start the server with: npm start
+3. Send an email to your Gmail with "[prompt]" in the subject
+4. Watch the server logs for processing output
+5. Verify relevant document chunks are found and returned
+
+## Sample Data for Search Testing
+
+This document contains various topics that can be searched:
+- Document indexing and vector embeddings
+- Email integration via IMAP and AWS SES
+- Configuration settings and environment variables
+- MCP protocol compatibility with LLMs
+- Real-time file watching with chokidar
+- PDF parsing using pdf-parse library
+- JSON-based persistent vector storage
+
+## Troubleshooting Common Issues
+
+If emails are not being processed:
+1. Verify IMAP is enabled in Gmail settings
+2. Check that app password is correctly configured (not regular password)
+3. Ensure subject contains exactly "[prompt]" (case-sensitive)
+4. Review server logs for connection errors
+
+If search results are empty:
+1. Confirm documents exist in the ./documents folder
+2. Verify embedding API is running and accessible
+3. Check that vector_store.json has been created after indexing
+4. Adjust SEARCH_MIN_SCORE threshold if needed
+
+## Contact Information
+
+For questions or issues with this RAG endpoint, please refer to the project documentation or check the README.md file for detailed setup instructions.
+
+---
+Document Version: 1.0
+Last Updated: Current Session
+Purpose: Testing and verification of RAG pipeline functionality

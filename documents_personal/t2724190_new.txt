@@ -1,0 +1,464 @@
+D2714         A                    5TH. DIST. COURT - ST. GEORGE                                                                                                   \
+D2714236502376AV101495808            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502376NROBERT BRIGGS LLC                                 xxxxx3873B160 S STATE ST                                              LA VERKIN       UT847455600 \
+D2714236502376NSOUTHERN SNOW                                     xxxxx6370B160 S STATE ST                                              LA VERKIN       UT847455600 \
+D2714246501616AF1070396416           WITHHOLDING TAX 10/2023 to 12/2023                                    000000030192240708                                      \
+D2714246501616NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714236502383AV1088320512           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502383NPERFORMANCE METRICS INC                           xxxxx0381B1400 CHAPEL ST                                              SANTA CLARA     UT847657012 \
+D2714246501617AF1094251520           SALES AND USE TAX 4/2023 to 6/2023                                    000000438237240708                                      \
+D2714246501617NBLUE SAGE ADVENTURES LLC                          xxxxx2105PPO BOX 662                                                  COLORADO CITY   AZ860210662 \
+D2714236502386AV1108653056           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502386NJP MOBILE RV REPAIR LLC                           xxxxx3510B710 S INDIAN HILLS DR                                       SAINT GEORGE    UT847706823 \
+D2714226502462AV1108759552           WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502462NHICKORY & SALT LLC                                xxxxx5469B1143 E OAK WOOD LN                                          WASHINGTON      UT847808800 \
+D2714246501618AF1115812864           WITHHOLDING TAX 1/2024 to 3/2024                                      000000163241240708                                      \
+D2714246501618NEL CAP INC                                        xxxxx0078B1241 S DESERT DR                                            APPLE VALLEY    UT847374902 \
+D2714196502855AV113308672            WITHHOLDING TAX 10/2018 to 12/2018                                    000000243001190902240708                                \
+D2714196502855NCANAAN MOUNTAIN ESTATE LLC                        xxxxx6690BPO BOX 841459                                               HILDALE         UT847841459 \
+D2714246501619AF1135932416           INCOME TAX 1/2023 to 12/2023                                          000000663794240708                                      \
+D2714246501619NVALENTINE,CAROLYN                                 xxxxx8567P572 S RIVERBED DR                                           WASHINGTON      UT847803570 \
+D2714246501619NVALENTINE,SHAWN                                   xxxxx8698P572 S RIVERBED DR                                           WASHINGTON      UT847803570 \
+D2714236502390AV1137488896           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502390NHONEY DOERS LLC                                   xxxxx9214B1210 W INDIAN HILLS DR                                      SAINT GEORGE    UT847706372 \
+D2714236502392AV1143780352           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502392NPANDA PAINTING LLC                                xxxxx8794B3785 W 140 N                                                HURRICANE       UT847372750 \
+D2714236502393AV1146598400           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502393NZION WHOLESALE FURNITURE LLC                      xxxxx5798B201 N STATE ST                                              HURRICANE       UT847371871 \
+D2714236502162AV1151284224           INCOME TAX 1/2022 to 12/2022                                          000000017636230821240708                                \
+D2714236502162NROTTMAN,FAITH E                                   xxxxx9811P11409 SHANGRI LA AVE                                        HESPERIA        CA923454521 \
+D2714226502467AV1152291840           WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502467NCLAVELL,FORREST                                   xxxxx6867P95 E CANYON RD                                              FILLMORE        UT846315022 \
+D2714246501559AV1165816832           SALES AND USE TAX 7/2023 to 9/2023                                    000000052847240701240708                                \
+D2714246501559NR & J STONE LLC                                   xxxxx5306B885 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
+D2714246501128AV1168864256           CORPORATE/PARTNERSHIP 1/2022 to 12/2022                               000000072221240506240708                                \
+D2714246501128NENDEVEREN MANAGEMENT                              xxxxx0467B2303 N CORAL CANYON BLVD                                    WASHINGTON      UT847802088 \
+D2714236502398AV1192735744           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502398NPRESSURE PERFECT POWER WASHING LLC                xxxxx2373B44 E 500 S                                                  SAINT GEORGE    UT847703605 \
+D2714246501620AF1214051328           SALES AND USE TAX 10/2023 to 12/2023                                  000000563882240708                                      \
+D2714246501620NLEWIS FLOWER MARKET LLC                           xxxxx4217B64 N 800 E                                                  SAINT GEORGE    UT847703045 \
+D2714246501621AF1215099904           INCOME TAX 1/2023 to 12/2023                                          000000035244240708                                      \
+D2714246501621NGARNER,SAVANNAH                                   xxxxx6484P104 N 60 E                                                  LA VERKIN       UT847455520 \
+D2714236500115AV1215222784           INCOME TAX 1/2021 to 12/2021                                          000000034161230116240708                                \
+D2714236500115NMATHEWS,ADAM J                                    xxxxx0102P330 N OAK GROVE DR                                          WASHINGTON      UT847808868 \
+D2714236502403AV1219834880           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502403NPUMPED LLC                                        xxxxx0375B2984 LIMESTONE DR                                           SAINT GEORGE    UT847906296 \
+D2714236502403NLOVE YOUR BATH BOMB                               xxxxx2240B2984 LIMESTONE DR                                           SAINT GEORGE    UT847906296 \
+D2714246501622AF1233089536           WITHHOLDING TAX 1/2024 to 3/2024                                      000000109327240708                                      \
+D2714246501622NLOS PLEBES MEXICAN FOOD LLC                       xxxxx6455B3737 W 180 N                                                HURRICANE       UT847372781 \
+D2714236503177AV1248637952           SALES AND USE TAX 4/2023 to 6/2023                                    000000145654231106240708                                \
+D2714236503177NRED VENTURES LLC                                  xxxxx2725B1534 W JADE DR                                              SAINT GEORGE    UT847706053 \
+D2714236503177NBIG CHILL                                         xxxxx8910B495 N STATE ST                                              LA VERKIN       UT847455124 \
+D2714236502412AV1259123712           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502412NKOOL KIDZ WORLD                                   xxxxx8220B12 E 700 S                                                  SAINT GEORGE    UT847703963 \
+D2714236502412NFORCHT,DAWNA M                                    xxxxx8419P3468 E HIDDEN SPRINGS DR                                    WASHINGTON      UT847802052 \
+D2714236502414AV1270133760           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502414NKAM HOME AESTHETICS LLC                           xxxxx5366B1001 W CURLY HOLLOW DR                                      SAINT GEORGE    UT847707538 \
+D2714206502345AV1277940736           WITHHOLDING TAX 10/2019 to 12/2019                                    000000203001200907240708                                \
+D2714206502345NDEEP ROOTS WELLNESS LLC                           xxxxx7147B1920 W RISING SUN DR                                        SAINT GEORGE    UT847707087 \
+D2714246501564AV1287189504           WITHHOLDING TAX 4/2023 to 6/2023                                      000000353618240701240708                                \
+D2714246501564NR & J STONE LLC                                   xxxxx5306B885 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
+D2714246501623AF1290466304           SALES AND USE TAX 1/2024 to 3/2024                                    000000388631240708                                      \
+D2714246501623NEL CAP INC                                        xxxxx0078B1241 S DESERT DR                                            APPLE VALLEY    UT847374902 \
+D2714236502420AV1314370560           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502420NPREMIER SOLAR LLC                                 xxxxx3118B1812 W SUNSET BLVD                                          SAINT GEORGE    UT847706565 \
+D2714236502421AV1315910656           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502421NSYMPHONY ASSET MANAGEMENT LLC                     xxxxx6243B1812 W SUNSET BLVD                                          SAINT GEORGE    UT847706565 \
+D2714166503403AV1321474048           INCOME TAX 1/2010 to 12/2010                                          000000171314161017240708                                \
+D2714166503403NPACKER,THOMAS M                                   xxxxx8116P3702 MITCHELL DR                                            SANTA CLARA     UT847655398 \
+D2714236502423AV1346417664           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502423NPRODIGY CONCRETE LLC                              xxxxx8536B488 SAGUARRO DR                                             WASHINGTON      UT847808401 \
+D2714226503365AV1358386176           INCOME TAX 1/2018 to 12/2018                                          000000056944221121240708                                \
+D2714226503365NNEWTON,RAY V                                      xxxxx5966P1040 N 1300 W                                               SAINT GEORGE    UT847706429 \
+D2714236502428AV1368175616           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502428NCURBY BROS LLC                                    xxxxx2175B2516 E ARBOR DR                                             SAINT GEORGE    UT847901348 \
+D2714246501292AV1373598720           SALES TRANSIENT ROOM 6/2022 to 6/2022                                 000000077734240527240708                                \
+D2714246501292NSTEPPING STONES MANAGEMENT GROUP LLC              xxxxx5350B1167 W 80 S                                                 HURRICANE       UT847372688 \
+D2714246501292NHURRICANE MYPLACE                                 xxxxx0880B1167 W 80 S                                                 HURRICANE       UT847372464 \
+D2714236502430AV137573376            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502430NMOXYI LLC                                         xxxxx0402B1050 E 500 S                                                SAINT GEORGE    UT847902043 \
+D2714236502430NMOXBOX COMICS                                     xxxxx9030B1050 E 500 S                                                SAINT GEORGE    UT847902043 \
+D2714236502433AV1390457856           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502433NBRAIN BODY BALANCE TREATMENT CENTERS LLC          xxxxx7423B943 PECAN CIR                                               SAINT GEORGE    UT847907575 \
+D2714236502434AV1395962880           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502434NAQUAMARINE LLC                                    xxxxx8418BPO BOX 111                                                  SAINT GEORGE    UT847710111 \
+D2714236502434NAQUAMARINE CONSULTING                             xxxxx2420BPO BOX 111                                                  SAINT GEORGE    UT847710111 \
+D2714246501624AF140309504            INCOME TAX 1/2022 to 12/2022                                          000001482121240708                                      \
+D2714246501624NBULLOCK,LISA M                                    xxxxx7988P950 S 960 E                                                 SAINT GEORGE    UT847905657 \
+D2714246501624NBULLOCK,SCOTT D                                   xxxxx6253P950 S 960 E                                                 SAINT GEORGE    UT847905657 \
+D2714236502436AV1415296000           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502436NDRAGON NAILS & SPA INC                            xxxxx8870B2654 RED CLIFFS DR                                          SAINT GEORGE    UT847905827 \
+D2714236502437AV1426043904           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502437NSE ENTERPRISES LLC                                xxxxx7961B2941 E 2070 S                                               NEW HARMONY     UT847575072 \
+D2714236502438AV1429025792           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502438NEMBERS AND ASH LLC                                xxxxx4129B55 E ANTONE WAY                                             WASHINGTON      UT847808393 \
+D2714236502438NASHES AND SAGE                                    xxxxx9070B55 E ANTONE WAY                                             WASHINGTON      UT847808393 \
+D2714236502442AV1441821696           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502442NMJREI LLC                                         xxxxx5332B590 E ST GEORGE BLVD                                        SAINT GEORGE    UT847702960 \
+D2714236502443AV1442526208           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502443NSPRINGS CHURCH                                    xxxxx8656BPO BOX 685                                                  PARRISH         FL342190685 \
+D2714246501625AF1445262336           INCOME TAX 1/2023 to 12/2023                                          000000359399240708                                      \
+D2714246501625NMONTOYA,NELLIE C                                  xxxxx3223P1305 E RIVERSIDE DR                                         SAINT GEORGE    UT847906723 \
+D2714236502447AV1458516992           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502447NSHORT CREEK HEALTH AND RECREATION INC             xxxxx8976B1155 N CANYON ST                                            HILDALE         UT84784     \
+D2714236502449AV1468675072           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502449NRAYS HOME REMODEL & RESTAURANT SUPPLY LLC         xxxxx8948B2410 W 350 N                                                HURRICANE       UT847372045 \
+D2714236502450AV1469101056           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502450NVNA INC                                           xxxxx7232BPO BOX 805                                                  HURRICANE       UT847370805 \
+D2714236502450NVIVID NAIL ACADEMY                                xxxxx4600BPO BOX 805                                                  HURRICANE       UT847370805 \
+D2714246501626AF1473049600           INCOME TAX 1/2023 to 12/2023                                          000000235898240708                                      \
+D2714246501626NCOOPER,RANDY J                                    xxxxx7700P211 W 840 S                                                 WASHINGTON      UT847802215 \
+D2714246501626NCOOPER,SARAH N                                    xxxxx6238P211 W 840 S                                                 WASHINGTON      UT847802215 \
+D2714236502453AV1475703808           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502453NFREESTYLE CUSTOM TILE AND STONE LLC               xxxxx9274BPO BOX 3224                                                 SAINT GEORGE    UT847713224 \
+D2714246501627AF1483535360           SALES AND USE TAX 10/2023 to 12/2023                                  000000178335240708                                      \
+D2714246501627NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714236502456AV1493152768           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502456NVISION BUILT 3D LLC                               xxxxx3782B740 N PINION ST                                             HILDALE         UT84784     \
+D2714236502458AV1495479296           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502458NB R & J CONSTRUCTION LLC                          xxxxx4681B1450 N DIXIE DOWNS RD                                       SAINT GEORGE    UT847704179 \
+D2714236502459AV1496200192           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502459NJC CUSTOM CARPENTRY LLC                           xxxxx6100B3765 W 165 N                                                HURRICANE       UT847372760 \
+D2714236502461AV1503949824           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502461NJNK FORMALS LLC                                   xxxxx9203B250 RED CLIFFS DR                                           SAINT GEORGE    UT847908172 \
+D2714236502191AV1511994368           INCOME TAX 1/2022 to 12/2022                                          000000013977230821240708                                \
+D2714236502191NFRAME,NATHAN                                      xxxxx8550P290 S 1200 E                                                SAINT GEORGE    UT847900601 \
+D2714236502464AV1520727040           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502464NABILITY CONSTRUCTION LLC                          xxxxx5284B685 N HILDALE ST                                            HILDALE         UT84784     \
+D2714226502527AV1579045888           WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502527NBTL BUILDERS COMPANY INC                          xxxxx8822B763 N SAGE CREST DR                                         WASHINGTON      UT847803075 \
+D2714236501752AV1589261312           INCOME TAX 1/2022 to 12/2022                                          000000030245230717240708                                \
+D2714236501752NLORENZO,IDA A                                     xxxxx7997P3854 LONDON LN                                              SANTA CLARA     UT847655644 \
+D2714226502529AV1594774528           WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502529NVENIENT SMART DETAIL LLC                          xxxxx7800B3785 E IMPALA DR                                            SAINT GEORGE    UT847901934 \
+D2714206502379AV1600635904           WITHHOLDING TAX 10/2019 to 12/2019                                    000000203001200907240708                                \
+D2714206502379NTERRAPIN OUTPOST LLC                              xxxxx2102B148 N KOLOB TERRACE RD                                      VIRGIN          UT847797709 \
+D2714246501459AV1603990528           SALES AND USE TAX 1/2024 to 3/2024                                    000000337681240617240708                                \
+D2714246501459NPAINT SHOP LLC                                    xxxxx1518B758 S 5725 W                                                HURRICANE       UT847374954 \
+D2714236501754AV1610953728           INCOME TAX 1/2022 to 12/2022                                          000001017083230717240708                                \
+D2714236501754NCORNELIUS,KENNETH D                               xxxxx0594PPO BOX 790174                                               VIRGIN          UT847790174 \
+D2714236501754NCORNELIUS,TINA M                                  xxxxx3693PPO BOX 790174                                               VIRGIN          UT847790174 \
+D2714236502483AV1627206656           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502483NCB ENGG & MFG CO LLC                              xxxxx3535B1398 S SANDHILL DR                                          WASHINGTON      UT847808625 \
+D2714226502535AV1627968512           WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502535NHURRICANE SHUTTLE LLC                             xxxxx7465B485 N 2170 W                                                HURRICANE       UT847371354 \
+D2714196502881AV1630491648           WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502881NCREATIVE LANDSCAPES LLC                           xxxxx6139BPO BOX 600                                                  PANGUITCH       UT847590600 \
+D2714246501628AF1631122432           SALES AND USE TAX 10/2023 to 12/2023                                  000000218677240708                                      \
+D2714246501628NBLUE SAGE ADVENTURES LLC                          xxxxx2105PPO BOX 662                                                  COLORADO CITY   AZ860210662 \
+D2714246501629AF1644622848           INCOME TAX 1/2023 to 12/2023                                          000000311607240708                                      \
+D2714246501629NWILSON,JACKIE A                                   xxxxx9856P212 N 80 E                                                  LA VERKIN       UT847455242 \
+D2714246501629NWILSON,THOMAS G                                   xxxxx1811P212 N 80 E                                                  LA VERKIN       UT847455242 \
+D2714236502490AV1653322752           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502490NSUB SHOP INC                                      xxxxx0716B952 N WESTRIDGE DR                                          SAINT GEORGE    UT847706452 \
+D2714236502490NSUB SHOP INC THE                                  xxxxx7260B952 N WESTRIDGE DR                                          SAINT GEORGE    UT847706452 \
+D2714236502492AV1675932672           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502492NH K OHANA LLC                                     xxxxx4204B2574 E 750 N                                                SAINT GEORGE    UT847909106 \
+D2714236502493AV1681732608           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502493NDIXIE HEATING AND AIR CONDITIONING INC            xxxxx7199BPO BOX 461327                                               LEEDS           UT847461327 \
+D2714246501630AF1686565888           PERSONAL ASSESSMENTS 1/2024 to 3/2024                                 000000045197240708                                      \
+D2714246501630NFORSEY,TIFFANI M                                  xxxxx9796P1111 W 2370 S                                               SAINT GEORGE    UT847706264 \
+D2714236502494AV1686877184           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502494NCROSBY CUSTOMS LLC                                xxxxx7680B284 S 200 W                                                 HURRICANE       UT847372113 \
+D2714196502885AV1688278016           WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502885NJONES BOYS FARMS INC                              xxxxx4119BPO BOX 310                                                  ENTERPRISE      UT847250310 \
+D2714236502496AV1693398016           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502496NCHOSA HOME BUILDERS LLC                           xxxxx7020B2546 W 235 N                                                HURRICANE       UT847371335 \
+D2714236502497AV1696904192           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502497NNAILMAX4U LLC                                     xxxxx3872B3155 S HIDDEN VALLEY DR                                     SAINT GEORGE    UT847906671 \
+D2714226502551AV1756861440           WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502551NREAL ESTATE DEVELOPER CONSULTANTS LLC             xxxxx3429B1081 E RAMOSE                                               TOQUERVILLE     UT847745061 \
+D2714226502554AV1761580032           WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502554NTRUMAX INC                                        xxxxx4651B90 W 100 N                                                  HURRICANE       UT847371612 \
+D2714236502511AV1803596800           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502511NMARTINEZ,LAURA                                    xxxxx5185P12 N MAIN ST                                                VEYO            UT847824149 \
+D2714236503129AV1823192064           INCOME TAX 1/2022 to 12/2022                                          000000075578231030240708                                \
+D2714236503129NGOMEZ,BELINDA L                                   xxxxx2238P470 E 1100 S                                                SAINT GEORGE    UT847905804 \
+D2714236503129NGOMEZ,RAFAEL                                      xxxxx0945P470 E 1100 S                                                SAINT GEORGE    UT847905804 \
+D2714236502516AV1838199808           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502516NENCORE CULTURAL ARTS CENTER                       xxxxx1671B905 S MAIN ST                                               SAINT GEORGE    UT847705538 \
+D2714236501314AV1841574912           INCOME TAX 1/2021 to 12/2021                                          000000181115230522240708                                \
+D2714236501314NNAFUS,KIMBERLEE A                                 xxxxx3042P320 E CLEVELAND AVE                                         SALT LAKE CITY  UT841151508 \
+D2714236502519AV1843442688           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502519NHK DISTRIBUTION LLC                               xxxxx9370B1459 E RIDGE ST                                             WASHINGTON      UT847801368 \
+D2714236502522AV1847800832           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502522NGREATER ZION AIR CONDITIONING AND HEATING LLC     xxxxx3818B210 E 600 S                                                 SAINT GEORGE    UT847703946 \
+D2714236502221AV1850160128           INCOME TAX 1/2022 to 12/2022                                          000000049779230821240708                                \
+D2714236502221NSTEPHENS,BRIAN R                                  xxxxx8428P1750 S SUMMERFIELD LN                                       WASHINGTON      UT847802513 \
+D2714166503434AV1858344960           INCOME TAX 1/2012 to 12/2012                                          000000139276161017240708                                \
+D2714166503434NPACKER,THOMAS M                                   xxxxx8116P3702 MITCHELL DR                                            SANTA CLARA     UT847655398 \
+D2714236502523AV1864315904           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502523NFLAT EARTH CONCRETE LLC                           xxxxx4540B150 N 3700 W                                                HURRICANE       UT847373318 \
+D2714236502525AV1872278528           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502525NLB MECHANICS INC                                  xxxxx4643B250 RED CLIFFS DR                                           SAINT GEORGE    UT847908167 \
+D2714246501631AF1875702784           SALES AND USE TAX 1/2023 to 3/2023                                    000000176810240708                                      \
+D2714246501631NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714236502526AV1879749632           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502526NCASTEEL LLC                                       xxxxx2233B2849 E 350 N                                                SAINT GEORGE    UT847907334 \
+D2714246501632AF1881338880           SALES AND USE TAX 8/2022 to 8/2022                                    000018686330240708                                      \
+D2714246501632NST GEORGE HOSPITALITY LLC MOTEL 6 ST GEORGE       xxxxx5091B205 N 1000 E                                                SAINT GEORGE    UT847703156 \
+D2714246501632NMOTEL 6 ST GEORGE                                 xxxxx2600B205 N 1000 E                                                SAINT GEORGE    UT847703156 \
+D2714236501812AV1908093952           INCOME TAX 1/2022 to 12/2022                                          000000026687230717240708                                \
+D2714236501812NMONTGOMERY,KELSIE A                               xxxxx8116P3271 E LABYRINTH POINT CIR                                  WASHINGTON      UT847803633 \
+D2714226502581AV190993408            WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502581NDESERT STAR FLOORING                              xxxxx4710B443 W 300 N                                                 SAINT GEORGE    UT847704508 \
+D2714226502581NLOUNSBURY,DAVID E                                 xxxxx8907P516 N 2200 E                                                SAINT GEORGE    UT847908132 \
+D2714236502530AV192050176            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502530NALTURAS INC                                       xxxxx2652B1323 S SPRINGS CIR                                          SAINT GEORGE    UT847906178 \
+D2714236502226AV1927951360           INCOME TAX 1/2022 to 12/2022                                          000000051007230821240708                                \
+D2714236502226NJACOBS,ELDONNA                                    xxxxx9709P407 N 3420 W                                                HURRICANE       UT847374417 \
+D2714236502533AV1949512704           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502533NUPRISE OF STG LLC                                 xxxxx0383B516 INDUSTRIAL RD                                           SAINT GEORGE    UT847703118 \
+D2714246500891AV1950249984           SALES AND USE TAX 7/2023 to 9/2023                                    000000114704240325240708                                \
+D2714246500891NIRON DOOR STORE LLC                               xxxxx0783B1111 W 2370 S                                               SAINT GEORGE    UT847706264 \
+D2714246500891NARTISAN IRON DOORS                                xxxxx6000B1111 W 2370 S                                               SAINT GEORGE    UT847706264 \
+D2714246501575AV1958278144           SALES AND USE TAX 10/2023 to 12/2023                                  000000052274240701240708                                \
+D2714246501575NR & J STONE LLC                                   xxxxx5306B885 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
+D2714246501303AV1971254272           SALES AND USE TAX 7/2023 to 9/2023                                    000000148907240527240708                                \
+D2714246501303NLEESTATION LLC                                    xxxxx0022BPO BOX 849                                                  ENTERPRISE      UT847250849 \
+D2714196501581AV1974379520           WITHHOLDING TAX 10/2018 to 12/2018                                    000000147001190603240708                                \
+D2714196501581NLEAK STOPPERS ROOF REPAIR LLC                     xxxxx2490B2930 E 450 N                                                SAINT GEORGE    UT847906434 \
+D2714236502536AV1976349696           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502536N2JN ENTERPRIZES LLC                               xxxxx7876BPO BOX 842535                                               HILDALE         UT847842535 \
+D2714236502543AV2010854400           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502543NSANTA CLARA SALSA CO LLC                          xxxxx9151B1485 CHAPEL ST                                              SANTA CLARA     UT847655325 \
+D2714246500444AV2029810688           WITHHOLDING TAX 7/2023 to 9/2023                                      000000306610240212240708                                \
+D2714246500444NCANFIELD CONSTRUCTION LLC                         xxxxx7272B285 W TABERNACLE ST                                         SAINT GEORGE    UT847706960 \
+D2714226502604AV2033161216           WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502604NEPIC POOLS LLC                                    xxxxx2353BPO BOX 189                                                  SAINT GEORGE    UT847710189 \
+D2714226502604NEPIC CUSTOM POOLS                                 xxxxx1880BPO BOX 189                                                  SAINT GEORGE    UT847710189 \
+D2714236502545AV2034021376           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502545NTWIGS EXTENTIONS                                  xxxxx9820B1406 N SUNRIDGE CIR                                         WASHINGTON      UT847802396 \
+D2714236502545NWATTS,TRACIE                                      xxxxx5680P1406 N SUNRIDGE CIR                                         WASHINGTON      UT847802396 \
+D2714196502904AV2036978688           WITHHOLDING TAX 10/2018 to 12/2018                                    000000243001190902240708                                \
+D2714196502904NSAINT GEORGE CLIMBING GYM LLC                     xxxxx9657B393 N 400 W                                                 SAINT GEORGE    UT847702738 \
+D2714196502904NSAINT GEORGE CLIMBING AND YOGA                    xxxxx9190B393 N 400 W                                                 SAINT GEORGE    UT847702738 \
+D2714236502548AV2058335232           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502548NSUNSET ENTERTAINMENT LLC                          xxxxx9135B3879 LONDON LN                                              SANTA CLARA     UT847655644 \
+D2714236502548NSUNSET KARAOKE                                    xxxxx7580B3879 LONDON LN                                              SANTA CLARA     UT847655644 \
+D2714236502550AV2063119360           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502550NSOUND LEAF                                        xxxxx8430B1368 W ROYAL CIR                                            SAINT GEORGE    UT847706478 \
+D2714236502550NWATSON,PIA C                                      xxxxx5050P1368 W ROYAL CIR                                            SAINT GEORGE    UT847706478 \
+D2714236502554AV2078585856           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502554NSTARS AND STRIPES CONCRETE PUMPING LLC            xxxxx8664B1308 W 540 N                                                SAINT GEORGE    UT847704651 \
+D2714196502909AV2079630336           WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502909NFITZ N SONS TRUCKING LLC                          xxxxx3184B80 W 200 N                                                  WASHINGTON      UT847801607 \
+D2714236502556AV2090120192           WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502556NOGUNSOLA & LEMON LLC                              xxxxx2008B453 S 600 E                                                 SAINT GEORGE    UT847703733 \
+D2714236502556NADAPTE                                            xxxxx5280B453 S 600 E                                                 SAINT GEORGE    UT847703733 \
+D2714246500177AV2092528640           INCOME TAX 1/2022 to 12/2022                                          000000017320240115240708                                \
+D2714246500177NBAXTER,DARIN                                      xxxxx8287P2636 E 3330 S                                               SAINT GEORGE    UT847907291 \
+D2714246500177NBAXTER,JILL M                                     xxxxx1703P2636 E 3330 S                                               SAINT GEORGE    UT847907291 \
+D2714236502559AV2112140288           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502559NADVANCED RESPONSE LLC                             xxxxx1107B2334 S RIVER RD                                             SAINT GEORGE    UT847906280 \
+D2714246501633AF2117792768           INCOME TAX 1/2023 to 12/2023                                          000000343959240708                                      \
+D2714246501633NJONES,ALYSSA J                                    xxxxx0610P3761 E IRON SPRINGS DR                                      SAINT GEORGE    UT847901351 \
+D2714246501633NJONES,NEKENZIE                                    xxxxx3601P3761 E IRON SPRINGS DR                                      SAINT GEORGE    UT847901351 \
+D2714226502141AV2125304832           INCOME TAX 1/2021 to 12/2021                                          000000375948220822240708                                \
+D2714226502141NDAVIS,CHERIE                                      xxxxx0542P103 SENTRY WAY                                              SIMPSONVILLE    SC296807401 \
+D2714216500538AV212616192            CORPORATE/PARTNERSHIP 1/2019 to 12/2019                               000000073151210201240708                                \
+D2714216500538NAXION CONSULTING                                  xxxxx3276B659 SARATOGA DR                                             SAINT GEORGE    UT847907449 \
+D2714246501634AF2127885312           SALES AND USE TAX 4/2023 to 6/2023                                    000000182165240708                                      \
+D2714246501634NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714236502563AV2129966080           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502563NTO SCALE LLC                                      xxxxx5445B1173 S 250 W                                                SAINT GEORGE    UT847706735 \
+D2714236502564AV2146743296           WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502564NMONEY GOOD LLC                                    xxxxx8781B487 S 1100 E                                                SAINT GEORGE    UT847905900 \
+D2714236502568AV215905280            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502568NSERVO LLC                                         xxxxx3544B444 SUNLAND DR                                              SAINT GEORGE    UT847905800 \
+D2714236501553AV216413184            PERSONAL ASSESSMENTS 7/2022 to 3/2023                                 000001033184230626240708                                \
+D2714236501553NLEWIS FLOWER MARKET LLC                           xxxxx6690B64 N 800 E                                                  SAINT GEORGE    UT847703045 \
+D2714236501553NLEWIS,SHERRIE                                     xxxxx0014P554 N 300 E                                                 WASHINGTON      UT847801725 \
+D2714236501637AV222442496            INCOME TAX 1/2022 to 12/2022                                          000000085441230710240708                                \
+D2714236501637NORTEGA,ANTHONY                                    xxxxx5274P1967 N CARTLAND DR                                          APPLE VALLEY    UT847374834 \
+D2714236501637NORTEGA,JENNIFER E                                 xxxxx5579P1967 N CARTLAND DR                                          APPLE VALLEY    UT847374834 \
+D2714246501307AV227111936            INCOME TAX 1/2022 to 12/2022                                          000000073508240527240708                                \
+D2714246501307NDAVIS,ELSIE                                       xxxxx7464P209 W 725 S                                                 HURRICANE       UT847371296 \
+D2714246501635AF229700608            SALES AND USE TAX 1/2024 to 1/2024                                    000000757115240708                                      \
+D2714246501635NCASA MIGUELS INC PANCHO & LEFT                    xxxxx7178PPO BOX 1623                                                 CEDAR CITY      UT847211623 \
+D2714246501635NPANCHO & LEFTYS ST GEORGE                         xxxxx6780P1050 S BLUFF ST                                             SAINT GEORGE    UT847705205 \
+D2714246500184AV230847488            INCOME TAX 1/2018 to 12/2018                                          000000255364240115240708                                \
+D2714246500184NSAXTON,SCOTT J                                    xxxxx6636P612 E COTTONTAIL RD                                         CENTRAL         UT847223136 \
+D2714236502571AV231945216            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502571NMAD HATTER WARPED AND WOVEN INC                   xxxxx7523B2292 S REDWOOD RD                                           WEST VALLEY CITYUT841191322 \
+D2714236502574AV241742848            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502574NBACLAYON LLC                                      xxxxx1234BPO BOX 1501                                                 WASHINGTON      UT847807501 \
+D2714246501413AV241759232            WITHHOLDING TAX 10/2023 to 12/2023                                    000000015378240610240708                                \
+D2714246501413NSUNRISE OASIS ACADEMY OF READING LLC              xxxxx1668B9 S 2370 EAST CIR                                           SAINT GEORGE    UT847906433 \
+D2714236503695AV24802304             INCOME TAX 1/2021 to 12/2021                                          000000434539231225240708                                \
+D2714236503695NTEW,JAYLEE M                                      xxxxx1754P856 E 1010 S                                                SAINT GEORGE    UT847904061 \
+D2714236503695NTEW,TRAVIS E                                      xxxxx9066P856 E 1010 S                                                SAINT GEORGE    UT847904061 \
+D2714236502579AV268645376            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502579NAUTHENTICALLY ALIGNED CONSULTING LLC              xxxxx0454B26 S 400 E                                                  CENTRAL         UT847223319 \
+D2714236502579NGROUNDING SOURCE                                  xxxxx2530B26 S 400 E                                                  CENTRAL         UT847223319 \
+D2714236502580AV272282624            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502580NKICKSTARTING HEALTHY LLC                          xxxxx6695B590 N STATE ST                                              HURRICANE       UT847371760 \
+D2714236502582AV278639616            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502582NLUTUI POWER PROS LLC                              xxxxx6810B2669 E 3200 S                                               SAINT GEORGE    UT847906144 \
+D2714226502641AV317346816            WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502641NTWINS TRUCKING LLC                                xxxxx9444B2261 E 700 N                                                SAINT GEORGE    UT847909100 \
+D2714226502642AV320754688            WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502642NREAL ESTATE COLLECTIVE LLC                        xxxxx9259B2 W ST GEORGE BLVD                                          SAINT GEORGE    UT847702857 \
+D2714246501636AF327611392            INCOME TAX 1/2023 to 12/2023                                          000000068590240708                                      \
+D2714246501636NHALL,GARY W                                       xxxxx0377P2253 BRYSON CIR                                             SANTA CLARA     UT847655429 \
+D2714246501636NHALL,STEPHANIE P                                  xxxxx2968P2253 BRYSON CIR                                             SANTA CLARA     UT847655429 \
+D2714236502588AV329954304            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502588NMRTURF LLC                                        xxxxx5868B201 W TABERNACLE ST                                         SAINT GEORGE    UT847707567 \
+D2714246501158AV342422528            SALES AND USE TAX 4/2023 to 6/2023                                    000000022739240506240708                                \
+D2714246501158NJC AUTO CONCEPTS                                  xxxxx4060B2271 ARROWHEAD TRL                                          SANTA CLARA     UT847655457 \
+D2714246501158NBENITEZ MANCILLA,JUAN C                           xxxxx0920P2271 ARROWHEAD TRL                                          SANTA CLARA     UT847655457 \
+D2714236502592AV363377664            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502592NST GEORGE BUSINESS CONSULTING & MARKETING LLC     xxxxx6234B38 W TABERNACLE ST                                          SAINT GEORGE    UT847707557 \
+D2714216503365AV371909632            WITHHOLDING TAX 10/2020 to 12/2020                                    000000203001211103240708                                \
+D2714216503365NEQUITY REAL ESTATE PREMIER TEAM ST GEORGE UT LLC  xxxxx2400B255 W 2025 S                                                SAINT GEORGE    UT847708733 \
+D2714236502596AV384775168            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502596N212 FAHRENHEIT CLOTHING CO LLC                    xxxxx2999B1185 N 1210 W                                               SAINT GEORGE    UT847704851 \
+D2714226502655AV389780480            WITHHOLDING TAX 10/2021 to 12/2021                                    000000243001220905240708                                \
+D2714226502655NRED ASPEN MEDIA LLC                               xxxxx7859B55 E 400 N                                                  HURRICANE       UT847371841 \
+D2714236502600AV391459840            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502600NB W C ELECTRIC LLC                                xxxxx4399B368 S MALL DR                                               SAINT GEORGE    UT847904527 \
+D2714246501637AF393540608            SALES PREPARED FOOD 1/2024 to 3/2024                                  000000065063240708                                      \
+D2714246501637NLOS PLEBES MEXICAN FOOD LLC                       xxxxx6455B3737 W 180 N                                                HURRICANE       UT847372781 \
+D2714246500796AV393835520            SALES AND USE TAX 10/2023 to 10/2023                                  000001442853240311240708                                \
+D2714246500796NCAR BARN LLC THE                                  xxxxx6788B1550 W STATE ST                                             HURRICANE       UT847372058 \
+D2714236502603AV403747840            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502603NA2B TECHNOLOGY LLC                                xxxxx0788BPO BOX 911082                                               SAINT GEORGE    UT847911082 \
+D2714236502604AV406107136            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502604NSKY ENTERPRISE LLC                                xxxxx9540B135 N 900 E                                                 SAINT GEORGE    UT847703024 \
+D2714246501638AF424080384            INCOME TAX 1/2023 to 12/2023                                          000000845223240708                                      \
+D2714246501638NSOUTHAM,BRENDA A                                  xxxxx2146P1890 N SERENITY DR                                          SAINT GEORGE    UT847704777 \
+D2714236502611AV443708416            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502611N23 FIT INC                                        xxxxx6548B790 S BLUFF ST                                              SAINT GEORGE    UT847703559 \
+D2714236502612AV445690880            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502612NHIGH DEGREE PERMANENT COSMETICS LLC               xxxxx7950B640 E 700 S                                                 SAINT GEORGE    UT847704006 \
+D2714236502614AV451458048            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502614NPALM CONSTRUCTION SERVICES LLC                    xxxxx7073B41 E SUNSET RIDGE DR                                        HURRICANE       UT847373550 \
+D2714246501639AF45806592             CORPORATE/PARTNERSHIP 1/2023 to 12/2023                               000000015144240708                                      \
+D2714246501639NMAINSTREET TRAVEL AGENCY INC                      xxxxx8282B929 W SUNSET BLVD                                           SAINT GEORGE    UT847704865 \
+D2714236502617AV48133120             WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502617NRAE BEAUTY LLC                                    xxxxx6363B190 N RED STONE RD                                          WASHINGTON      UT847803316 \
+D2714246501640AF485159936            SALES AND USE TAX 3/2024 to 3/2024                                    000001071031240708                                      \
+D2714246501640NLA RESTAURANT LLC                                 xxxxx7315B705 N BLUFF ST                                              SAINT GEORGE    UT847702641 \
+D2714246501640NALBERTOS MEXICAN FOOD                             xxxxx7400B705 N BLUFF ST                                              SAINT GEORGE    UT847702641 \
+D2714216503617AV492442624            WITHHOLDING TAX 10/2020 to 12/2020                                    000000243001211206240708                                \
+D2714216503617NFUELOGISTIC INC                                   xxxxx9611B1812 W SUNSET BLVD                                          SAINT GEORGE    UT847706565 \
+D2714236502620AV49312768             WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502620NFOODIE MEAL PREP LLC                              xxxxx2866B1506 S SILICON WAY                                          SAINT GEORGE    UT847707151 \
+D2714226502677AV502682624            WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502677NDUNE MEDIA LLC                                    xxxxx7220B44507 W REDROCK RD                                          MARICOPA        AZ851395468 \
+D2714226502678AV505304064            WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502678NMOON GROUP LLC                                    xxxxx6862B644 E SPRINGHILL DR                                         WASHINGTON      UT847802317 \
+D2714236502623AV509064192            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502623NADVANCED HANDYMAN REPAIR AND CONSTRUCTION LLC     xxxxx2691B1204 IMPERIAL LN                                            WASHINGTON      UT847802227 \
+D2714246501027AV524121088            SALES PREPARED FOOD 10/2023 to 10/2023                                000000256889240415240708                                \
+D2714246501027NGURUS SPORTS BAR & GRILL INC                      xxxxx3490B2153 E SUNSHINE TRL                                         SAINT GEORGE    UT847901972 \
+D2714246501641AF533525504            SALES AND USE TAX 7/2023 to 9/2023                                    000000180368240708                                      \
+D2714246501641NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714196502934AV537388032            WITHHOLDING TAX 10/2018 to 12/2018                                    000000243001190902240708                                \
+D2714196502934NACCELERATED HOUSE BUYERS LLC                      xxxxx6590B1812 W SUNSET BLVD                                          SAINT GEORGE    UT847706565 \
+D2714206502470AV555607040            WITHHOLDING TAX 10/2019 to 12/2019                                    000000203001200907240708                                \
+D2714206502470NTHE OLD BODEGA INC                                xxxxx4686BPO BOX 428                                                  SANTA CLARA     UT847650428 \
+D2714246501642AF557380608            SALES AND USE TAX 7/2023 to 9/2023                                    000000237864240708                                      \
+D2714246501642NBLUE SAGE ADVENTURES LLC                          xxxxx2105PPO BOX 662                                                  COLORADO CITY   AZ860210662 \
+D2714236502636AV567981056            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502636NSIMPLE BUILDS CO                                  xxxxx5140B2684 AQUARIUS CIR                                           SAINT GEORGE    UT847907601 \
+D2714236502636NSIMPLE PLANS SIMPLE BUILDS                        xxxxx0990B2684 AQUARIUS CIR                                           SAINT GEORGE    UT847907601 \
+D2714246501643AF570881024            INCOME TAX 1/2023 to 12/2023                                          000011913517240708                                      \
+D2714246501643NTURLEY,MCKENZIE                                   xxxxx8763P4015 S LITTLE VALLEY RD                                     SAINT GEORGE    UT847908033 \
+D2714246501643NTURLEY,TYLER V                                    xxxxx3249P4015 S LITTLE VALLEY RD                                     SAINT GEORGE    UT847908033 \
+D2714246500455AV58291200             INCOME TAX 1/2021 to 12/2021                                          000001302241240212240708                                \
+D2714246500455NTIPTON,CIANNA E                                   xxxxx4649P206 N SAGE CREST CIR                                        WASHINGTON      UT847802415 \
+D2714246500455NTIPTON,TALLEN C                                   xxxxx6190P206 N SAGE CREST CIR                                        WASHINGTON      UT847802415 \
+D2714246501644AF601322496            WITHHOLDING TAX 1/2024 to 3/2024                                      000000265871240708                                      \
+D2714246501644NSEGURA CONSTRUCTION LLC                           xxxxx2923B1648 E HONEYCOMB DR                                         SAINT GEORGE    UT847901852 \
+D2714236502641AV607335424            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502641NPARKER LANDDECK FRAMING LLC                       xxxxx2121B1167 E 400 S                                                SAINT GEORGE    UT847905767 \
+D2714236502642AV619230208            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502642NMOSHER CONCRETE LLC                               xxxxx3628B378 N 3380 W                                                HURRICANE       UT847374447 \
+D2714246501583AV619377664            WITHHOLDING TAX 10/2023 to 12/2023                                    000000203001240701240708                                \
+D2714246501583NHITCHECK INC                                      xxxxx6596B2135 N TACHEENE DR                                          SAINT GEORGE    UT847701229 \
+D2714236502644AV621851648            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502644NTOGETHER LLC                                      xxxxx1197B1321 N 2200 W                                               SAINT GEORGE    UT847705755 \
+D2714246501584AV628945920            WITHHOLDING TAX 7/2023 to 9/2023                                      000000350085240701240708                                \
+D2714246501584NR & J STONE LLC                                   xxxxx5306B885 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
+D2714246501167AV63239168             SALES AND USE TAX 7/2023 to 9/2023                                    000000061756240506240708                                \
+D2714246501167NJC AUTO CONCEPTS                                  xxxxx4060B2271 ARROWHEAD TRL                                          SANTA CLARA     UT847655457 \
+D2714246501167NBENITEZ MANCILLA,JUAN C                           xxxxx0920P2271 ARROWHEAD TRL                                          SANTA CLARA     UT847655457 \
+D2714236502648AV648918016            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502648NHERMANOS CONSTRUCTION LLC                         xxxxx2959B165 W 300 N                                                 IVINS           UT847386133 \
+D2714196502941AV659731456            WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502941NSHINE FESTIVAL LLC                                xxxxx3806B619 S BLUFF ST                                              SAINT GEORGE    UT847704879 \
+D2714236502651AV663532544            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502651NSTRATEGIX GLOBAL LLC                              xxxxx4531B491 N BLUFF ST                                              SAINT GEORGE    UT847707382 \
+D2714246500297AV683308032            PERSONAL ASSESSMENTS 4/2023 to 6/2023                                 000000128201240122240708                                \
+D2714246500297NBIG CHILL                                         xxxxx8910B495 N STATE ST                                              LA VERKIN       UT847455124 \
+D2714246500297NMCGUIRE,BENJAMIN N                                xxxxx5596P1534 W JADE DR                                              SAINT GEORGE    UT847706053 \
+D2714196502943AV686863360            WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502943NCOUNTRY BOYS LLC                                  xxxxx2102B782 S RIVER RD                                              SAINT GEORGE    UT847905716 \
+D2714196502945AV697775104            WITHHOLDING TAX 10/2018 to 12/2018                                    000000203001190902240708                                \
+D2714196502945NAHMADS FOOD LLC                                   xxxxx9838B140 N 400 W                                                 SAINT GEORGE    UT847702749 \
+D2714196502945NKRAVE FROZEN YOGURT AND ICE CREAM                 xxxxx2900B140 N 400 W                                                 SAINT GEORGE    UT847702749 \
+D2714236502660AV708097024            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502660NADVENTURE PAD LLC                                 xxxxx4707BPO BOX 790148                                               VIRGIN          UT847790148 \
+D2714226503170AV716002304            INCOME TAX 1/2016 to 12/2016                                          000000034303221017240708                                \
+D2714226503170NHALL,MARK H                                       xxxxx2193P10564 S PIPESTONE WAY                                       SOUTH JORDAN    UT840091425 \
+D2714236501331AV720647168            INCOME TAX 1/2020 to 12/2020                                          000000091663230522240708                                \
+D2714236501331NNAFUS,KIMBERLEE A                                 xxxxx3042P320 E CLEVELAND AVE                                         SALT LAKE CITY  UT841151508 \
+D2714226502709AV722228224            WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502709NCOUNTRY ROSE RV LLC                               xxxxx7483B148 W INDUSTRIAL DR                                         WASHINGTON      UT847802203 \
+D2714236502662AV72922112             WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502662NBLEST LLC                                         xxxxx0525B2692 E CLEAR POINT DR                                       WASHINGTON      UT847802631 \
+D2714236502667AV747942912            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502667NSAMANTHA LANDY MINISTRIES                         xxxxx4664B1992 WESTCLIFF DR                                           SAINT GEORGE    UT847906526 \
+D2714236502668AV750990336            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502668NHARD BLAKK LLC                                    xxxxx3899B5544 S OCHRE LN                                             SAINT GEORGE    UT847901875 \
+D2714236502673AV764785664            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502673NERC PROS PC                                       xxxxx5074B3466 E CHURCH ROCKS CIR                                     SAINT GEORGE    UT847905043 \
+D2714246501279AV766473216            SALES PREPARED FOOD 2/2024 to 2/2024                                  000000196819240520240708                                \
+D2714246501279NGURUS SPORTS BAR & GRILL INC                      xxxxx3490B2153 E SUNSHINE TRL                                         SAINT GEORGE    UT847901972 \
+D2714236502675AV775238656            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502675NTRIAS & SONS LLC                                  xxxxx8522B1167 E 400 S                                                SAINT GEORGE    UT847905771 \
+D2714166503484AV784603136            INCOME TAX 1/2011 to 12/2011                                          000000224877161017240708                                \
+D2714166503484NPACKER,THOMAS M                                   xxxxx8116P3702 MITCHELL DR                                            SANTA CLARA     UT847655398 \
+D2714236502677AV790344704            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502677NAPOTHEM                                           xxxxx3791B301 N 200 E                                                 SAINT GEORGE    UT847703040 \
+D2714246501645AF801960960            SALES AND USE TAX 10/2022 to 12/2022                                  000000185703240708                                      \
+D2714246501645NPRIMESOURCE SUPPLY LLC                            xxxxx0985B491 N OLD HIGHWAY 91                                        HURRICANE       UT847373533 \
+D2714226503207AV803623936            CORPORATE/PARTNERSHIP 1/2020 to 12/2020                               000000016416221024240708                                \
+D2714226503207NAXION CONSULTING                                  xxxxx3276B659 SARATOGA DR                                             SAINT GEORGE    UT847907449 \
+D2714236502683AV818459648            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502683NEMERSON JANE WELLNESS CENTER PLLC                 xxxxx1615B172 S 200 E                                                 SAINT GEORGE    UT847703436 \
+D2714246501646AF825816064            SALES AND USE TAX 1/2024 to 3/2024                                    000000561840240708                                      \
+D2714246501646NLEWIS FLOWER MARKET LLC                           xxxxx4217B64 N 800 E                                                  SAINT GEORGE    UT847703045 \
+D2714226502733AV840061952            WITHHOLDING TAX 10/2021 to 12/2021                                    000000203001220905240708                                \
+D2714226502733NRBNK TRANSPORTS LLC                               xxxxx3693B373 COMMERCE DR                                             HURRICANE       UT847373552 \
+D2714156504034AV846964736            PERSONAL ASSESSMENTS 4/2014 to 5/2015                                 000002673414151207240708                                \
+D2714156504034NLA FRONTERA - ST GEORGE                           xxxxx2250B1183 E 100 S                                                SAINT GEORGE    UT847903000 \
+D2714156504034NMONTANO,TERRY J                                   xxxxx0016PPO BOX 2525                                                 SAINT GEORGE    UT847712525 \
+D2714236502690AV853586944            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502690NREDLINE DETAIL LLC                                xxxxx2097B1009 W 50 N                                                 SAINT GEORGE    UT847708020 \
+D2714246501590AV884536320            SALES AND USE TAX 4/2023 to 6/2023                                    000000053356240701240708                                \
+D2714246501590NR & J STONE LLC                                   xxxxx5306B885 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
+D2714246501647AF897381376            SALES AND USE TAX 1/2024 to 3/2024                                    000000421921240708                                      \
+D2714246501647NLOS PLEBES MEXICAN FOOD LLC                       xxxxx6455B3737 W 180 N                                                HURRICANE       UT847372781 \
+D2714236502694AV903918592            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502694NLEMASTER GRADING INC                              xxxxx5880B1554 S BADGER WAY                                           NEW HARMONY     UT847571208 \
+D2714236502701AV931968000            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502701NSPILLED MILK ICE CREAM  ST GEORGE LLC             xxxxx7155B1480 S RIVER RD                                             SAINT GEORGE    UT847901281 \
+D2714236502702AV932557824            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502702NRE EMERGE LLC                                     xxxxx3276B107 S 1470 E                                                SAINT GEORGE    UT847901745 \
+D2714236502703AV936162304            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502703NREVITALIZE HEALTH PLLC                            xxxxx4748B11333 N SCOTTSDALE RD                                       SCOTTSDALE      AZ852545188 \
+D2714226503702AV93639680             INCOME TAX 1/2021 to 12/2021                                          000000019497221219240708                                \
+D2714226503702NTRUJILLO,JOSHUE                                   xxxxx5867P150 N 1100 E                                                WASHINGTON      UT847802882 \
+D2714246501648AF945353728            INCOME TAX 1/2023 to 12/2023                                          000000170755240708                                      \
+D2714246501648NPHILLIPS,ASHLEY REBECCA                           xxxxx7026P1386 N 2130 W                                               SAINT GEORGE    UT847705761 \
+D2714246501648NPHILLIPS,CALEB LEE                                xxxxx8957P1386 N 2130 W                                               SAINT GEORGE    UT847705761 \
+D2714236502706AV945763328            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502706NTRU FIT TACTICAL LLC                              xxxxx6271B455 S 1100 E                                                SAINT GEORGE    UT847902038 \
+D2714236502356AV950580224            WITHHOLDING TAX 1/2022 to 3/2022                                      000000042176230828240708                                \
+D2714236502356NALPHA HOMECARE HOSPICE INC                        xxxxx1714B1570 N RAVEN LN                                             SAINT GEORGE    UT847706135 \
+D2714236502711AV975221760            WITHHOLDING TAX 10/2022 to 12/2022                                    000000203001230904240708                                \
+D2714236502711NOMITROZ LLC                                       xxxxx4422BPO BOX 842424                                               HILDALE         UT847842424 \
+D2714236502718AV999863296            WITHHOLDING TAX 10/2022 to 12/2022                                    000000243001230904240708                                \
+D2714236502718NSALES ACADEMY INC THE                             xxxxx9438B811 N OLD FARMS RD                                          DAMMERON VALLEY UT847835203 \
